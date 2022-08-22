@@ -11,6 +11,10 @@ class DefaultController extends AbstractController
     #[Route(path: '/wellcome', name: 'wellcome', methods: ['GET'])]
     public function wellcome(): Response
     {
-        return new Response('<h1>Welcome to your application</h1>');
+        $wellcome = '...';
+
+        return $this->render('index.html.twig', [
+            'wellcome' => $wellcome,
+        ]);
     }
 }
