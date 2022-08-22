@@ -1,0 +1,22 @@
+# IDE
+/.vscode/*
+
+# Build artifacts
+/.docker_data/mysql/*
+/docker_data/mysql/
+!.docker_data/mysql/.gitkeep
+
+
+# Cache Symfony
+/var/cache/*
+!var/cache/.gitkeep
+
+# Logs Symfony
+/var/log/*
+!var/log/.gitkeep
+
+# Managed by Composer
+/var/bootstrap.php.cache
+/bin/*
+!bin/console
+/vendor/
