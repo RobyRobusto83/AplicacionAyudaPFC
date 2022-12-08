@@ -10,7 +10,7 @@
           <a class="nav-link" href="#/pfc">PFC</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/tasks">Tareas</a>
+          <a class="nav-link" href="#/tasks">Tareas</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#/about">About us</a>

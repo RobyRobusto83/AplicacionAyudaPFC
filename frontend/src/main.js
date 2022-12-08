@@ -4,11 +4,15 @@ import VueRouter from 'vue-router'
 import App from './App.vue'
 import Home from './pages/Home.vue'
 import PFC from './pages/PFC.vue'
+import TaskList from './pages/Tasks.vue'
 import AboutUs from './pages/AboutUs.vue'
 
 // Import Bootstrap and BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import 'bootstrap/dist/js/bootstrap.bundle.js'
+import 'bootstrap/dist/js/bootstrap.min.js'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 
 // Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue)
@@ -22,6 +26,7 @@ Vue.config.productionTip = false
 const routes = [
   { path: '/', component: Home },
   { path: '/pfc', component: PFC },
+  { path: '/tasks', component: TaskList },
   { path: '/about', component: AboutUs },
 ]
 const router = new VueRouter({
