@@ -6,15 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class DefaultController extends AbstractController
+class capituloController extends AbstractController
 {
-    #[Route(path: '/', name: 'home', methods: ['GET'])]
+    #[Route(path: '/capitulo', name: 'capitulo', methods: ['GET'])]
     public function home(): Response
     {
-        $wellcome = '...';
-
-        return $this->render('index.html.twig', [
-            'wellcome' => $wellcome,
-        ]);
+        return $this->render('capitulo.html.twig', []);
     }
 }
