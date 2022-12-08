@@ -1,4 +1,3 @@
-
 # Cache Symfony
 /var/cache/*
 !var/cache/.gitkeep
@@ -11,7 +10,6 @@
 /var/bootstrap.php.cache
 /bin/*
 !bin/console
-/vendor/
 
 ###> symfony/framework-bundle ###
 /.env.local
@@ -19,6 +17,5 @@
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
-/var/
 /vendor/
 ###< symfony/framework-bundle ###
