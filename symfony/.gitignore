@@ -1,0 +1,24 @@
+
+# Cache Symfony
+/var/cache/*
+!var/cache/.gitkeep
+
+# Logs Symfony
+/var/log/*
+!var/log/.gitkeep
+
+# Managed by Composer
+/var/bootstrap.php.cache
+/bin/*
+!bin/console
+/vendor/
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
