@@ -1,158 +1,383 @@
 <template>
-<div>
-<div>
-  <div class="container">
-    <div class="row align-items-center">
-        <div class="col-md-6">
-            <div class="mb-3">
-                <h5 class="card-title">Listado de tareas</h5>
-            </div>
-        </div>
-                <div>
-                    <a href="/addTask" data-bs-toggle="modal" data-bs-target=".add-new" class="btn btn-primary"><b-icon icon="plus"></b-icon> Nueva tarea</a>
+    <div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="md-3">
+                    <h5 class="card-title">Listado de tareas</h5>
+                </div>
+                <div class="md-1">
+                  <b-button @click="create($event.target)">Nueva tarea</b-button>
                 </div>
             </div>
         </div>
+        <b-container fluid>
+    <!-- User Interface controls -->
+    <b-row>
+      <b-col lg="6" class="my-1">
+        <b-form-group
+          label="Sort"
+          label-for="sort-by-select"
+          label-cols-sm="3"
+          label-align-sm="right"
+          label-size="sm"
+          class="mb-0"
+          v-slot="{ ariaDescribedby }"
+        >
+          <b-input-group size="sm">
+            <b-form-select
+              id="sort-by-select"
+              v-model="sortBy"
+              :options="sortOptions"
+              :aria-describedby="ariaDescribedby"
+              class="w-75"
+            >
+              <template #first>
+                <option value="">-- none --</option>
+              </template>
+            </b-form-select>
+
+            <b-form-select
+              v-model="sortDesc"
+              :disabled="!sortBy"
+              :aria-describedby="ariaDescribedby"
+              size="sm"
+              class="w-25"
+            >
+              <option :value="false">Asc</option>
+              <option :value="true">Desc</option>
+            </b-form-select>
+          </b-input-group>
+        </b-form-group>
+      </b-col>
+
+      <b-col lg="6" class="my-1">
+        <b-form-group
+          label="Initial sort"
+          label-for="initial-sort-select"
+          label-cols-sm="3"
+          label-align-sm="right"
+          label-size="sm"
+          class="mb-0"
+        >
+          <b-form-select
+            id="initial-sort-select"
+            v-model="sortDirection"
+            :options="['asc', 'desc', 'last']"
+            size="sm"
+          ></b-form-select>
+        </b-form-group>
+      </b-col>
+
+      <b-col lg="6" class="my-1">
+        <b-form-group
+          label="Filter"
+          label-for="filter-input"
+          label-cols-sm="3"
+          label-align-sm="right"
+          label-size="sm"
+          class="mb-0"
+        >
+          <b-input-group size="sm">
+            <b-form-input
+              id="filter-input"
+              v-model="filter"
+              type="search"
+              placeholder="Type to Search"
+            ></b-form-input>
+
+            <b-input-group-append>
+              <b-button :disabled="!filter" @click="filter = ''">Clear</b-button>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
+      </b-col>
+
+      <b-col lg="6" class="my-1">
+        <b-form-group
+          v-model="sortDirection"
+          label="Filter On"
+          description="Leave all unchecked to filter on all data"
+          label-cols-sm="3"
+          label-align-sm="right"
+          label-size="sm"
+          class="mb-0"
+          v-slot="{ ariaDescribedby }"
+        >
+          <b-form-checkbox-group
+            v-model="filterOn"
+            :aria-describedby="ariaDescribedby"
+            class="mt-1"
+          >
+            <b-form-checkbox value="name">Nombre</b-form-checkbox>
+            <b-form-checkbox value="priority">Prioridad</b-form-checkbox>
+            <b-form-checkbox value="isCompleted">Completada</b-form-checkbox>
+          </b-form-checkbox-group>
+        </b-form-group>
+      </b-col>
+
+      <b-col sm="5" md="6" class="my-1">
+        <b-form-group
+          label="Per page"
+          label-for="per-page-select"
+          label-cols-sm="6"
+          label-cols-md="4"
+          label-cols-lg="3"
+          label-align-sm="right"
+          label-size="sm"
+          class="mb-0"
+        >
+          <b-form-select
+            id="per-page-select"
+            v-model="perPage"
+            :options="pageOptions"
+            size="sm"
+          ></b-form-select>
+        </b-form-group>
+      </b-col>
+
+      <b-col sm="7" md="6" class="my-1">
+        <b-pagination
+          v-model="currentPage"
+          :total-rows="totalRows"
+          :per-page="perPage"
+          align="fill"
+          size="sm"
+          class="my-0"
+        ></b-pagination>
+      </b-col>
+    </b-row>
+
+    <!-- Main table element -->
+    <b-table
+      :items="items"
+      :fields="fields"
+      :current-page="currentPage"
+      :per-page="perPage"
+      :filter="filter"
+      :filter-included-fields="filterOn"
+      :sort-by.sync="sortBy"
+      :sort-desc.sync="sortDesc"
+      :sort-direction="sortDirection"
+      stacked="md"
+      show-empty
+      small
+      @filtered="onFiltered"
+    >
+      <template #cell(name)="row">
+        {{ row.value.first }} {{ row.value.last }}
+      </template>
+
+      <template #cell(actions)="row">
+        <b-button size="sm" class="mr-1" variant="outline-primary">
+            <b-icon icon="pen-fill"/>
+        </b-button>
+        <b-button size="sm" @click="info(row.item, row.index, $event.target)" class="mr-1" variant="outline-danger">
+            <b-icon icon="trash"/>
+        </b-button>
+        <b-button size="sm" @click="timer(row.item, row.index, $event.target)" class="mr-1" variant="outline-success">
+            <b-icon icon="clock"/>
+        </b-button>
+        <b-button size="sm" @click="row.toggleDetails" variant="outline-secondary">
+          <b-icon v-if="row.detailsShowing" icon="eye-slash"/><b-icon v-else icon="eye"/>
+        </b-button>
+      </template>
+
+      <template #row-details="row">
+        <b-card>
+          <ul>
+            <li v-for="(value, key) in row.item" :key="key">{{ key }}: {{ value }}</li>
+          </ul>
+        </b-card>
+      </template>
+    </b-table>
+
+    <!-- Delete modal -->
+    <b-modal :id="deleteModal.id" :title="deleteModal.title" @hide="resetDeleteModal" @ok="removeRow(deleteModal.index)">
+        <p>Confirm that you are about to delete task: {{ deleteModal.content }}</p>
+    </b-modal>    
+
+    <!-- Create modal -->
+    <b-modal :id="createModal.id" :title="createModal.title" @hide="resetCreateModal" @ok="createRow" >
+      <template #modal-header="{ close }">
+        <!-- Emulate built in modal header close button action -->
+        <h5>Nueva tarea</h5>
+        <button type="button" aria-label="Close" class="close" @click="close()">×</button>
+      </template>
+
+      <template>
+          <TaskForm />
+      </template>
+
+      <template #modal-footer="{ ok, hide}">
+        <!-- Emulate built in modal footer ok and cancel button actions -->
+        <b-button size="sm" variant="success" @click="ok()">Guardar</b-button>
+        <!-- Button with custom close trigger value -->
+        <b-button size="sm" variant="outline-secondary" @click="hide()">Cancelar</b-button>
+      </template>
+    </b-modal>
+
+    <b-modal :id="timerModal.id" :title="timerModal.title" @hide="resetTimerModal" @ok="addTimer(timerModal.index)">
+        <TimerClock />
+    </b-modal>  
+  </b-container>
     </div>
-    <div class="row">
-        <div class="col-lg-12">
-                <div class="table-responsive">
-                    <table class="table project-list-table table-nowrap align-middle table-borderless">
-                        <thead>
-                            <tr>
-                                <th scope="col" class="ps-4" style="width: 50px;"></th>
-                                <th scope="col">Nombre</th>
-                                <th scope="col">Descripción</th>
-                                <th scope="col">Prioridades</th>
-                                <th scope="col" style="width: 200px;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                          <TaskItem />
-                          <TaskItem />                                               
-                        </tbody>
-                    </table>
-                </div>
-        </div>
-    </div>
-    <div class="row g-0 align-items-center pb-4">
-        <div class="col-sm-6">
-            <div><p class="mb-sm-0">Primera página</p></div>
-        </div>
-        <div class="col-sm-6">
-            <div class="float-sm-end">
-                <ul class="pagination mb-sm-0">
-                    <li class="page-item disabled">
-                        <a href="#" class="page-link"><b-icon icon="chevron-double-left"></b-icon></a>
-                    </li>
-                    <li class="page-item active"><a href="#" class="page-link">1</a></li>
-                    <li class="page-item"><a href="#" class="page-link">2</a></li>
-                    <li class="page-item"><a href="#" class="page-link">3</a></li>
-                    <li class="page-item"><a href="#" class="page-link">4</a></li>
-                    <li class="page-item"><a href="#" class="page-link">5</a></li>
-                    <li class="page-item disabled">
-                        <a href="#" class="page-link"><b-icon icon="chevron-double-right"></b-icon></a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-</template>
+  </template>
+    
+  <script>  
+  import TaskForm from "@/components/task/TaskForm.vue"
+  import TimerClock from "@/components/task/TimerClock.vue"
 
-<script>
-import TaskItem from '../components/TaskItem.vue'
-export default {
-  name: 'TaskList',
-  components: {
-    TaskItem
+  export default {
+    name: 'TaskList',
+    components: {
+      TaskForm,
+      TimerClock
+    },
+    data() {
+      return {
+        items: [
+          { isCompleted: true, name: { first: 'Dickerson', last: 'Macdonald' }, description: "Lorem ipsum", priority: "Alta", _rowVariant: 'danger' },
+          { isCompleted: false, name: { first: 'Larsen', last: 'Shaw' }, description: "Mauris auctor mattis ", priority: "Media", _rowVariant: 'warning'  },
+          {
+            isCompleted: false,
+            name: { first: 'Mini', last: 'Navarro' }, 
+            description: "Proin fermentum mi sed", 
+            priority: "Alta" ,
+            _rowVariant: 'success'
+          },
+          { isCompleted: false, name: { first: 'Geneva', last: 'Wilson' }, description: "Nam in tempor massa.", priority: "Alta"  },
+          { isCompleted: true,  name: { first: 'Jami', last: 'Carney' }, description: "In aliquet lacinia ornare", priority: "Baja"  },
+          { isCompleted: false,  name: { first: 'Essie', last: 'Dunlap' }, description: "Cras interdum malesuada odio", priority: "Alta"  },
+          { isCompleted: true,  name: { first: 'Thor', last: 'Macdonald' }, description: "Vivamus pharetra arcu id neque", priority: "Alta"  },
+          {
+            isCompleted: true,
+            name: { first: 'Larsen', last: 'Shaw' }, 
+            description: "Curabitur eget fermentum ex", 
+            priority: "Baja" 
+          },
+          { isCompleted: false, name: { first: 'Mitzi', last: 'Navarro' }, description: "Etiam ac lacus lorem.", priority: "Alta"  },
+          { isCompleted: false, name: { first: 'Genevieve', last: 'Wilson' } , description: "Vestibulum ante ipsum primis", priority: "Media" },
+          { isCompleted: true,  name: { first: 'John', last: 'Carney' } , description: "Fusce viverra non leo vel tincidunt", priority: "Baja" },
+          { isCompleted: false, name: { first: 'Dick', last: 'Dunlap' } , description: "Curabitur lorem eros", priority: "Alta" }
+        ],
+        fields: [
+          { key: 'name', label: 'Nombre', sortable: true, sortDirection: 'desc' },
+          { key: 'description', label: 'Descripción', sortable: true, sortDirection: 'desc' },
+          { key: 'priority', label: 'Prioridad', sortable: true, class: 'text-center' },
+          {
+            key: 'isCompleted',
+            label: 'Completada',
+            formatter: (value) => {
+              return value ? 'Yes' : 'No'
+            },
+            sortable: true,
+            sortByFormatted: true,
+            filterByFormatted: true
+          },
+          { key: 'actions', label: 'Actions' }
+        ],
+        totalRows: 1,
+        currentPage: 1,
+        perPage: 5,
+        pageOptions: [5, 10, 15, { value: 100, text: "Show a lot" }],
+        sortBy: '',
+        sortDesc: false,
+        sortDirection: 'asc',
+        filter: null,
+        filterOn: [],
+        deleteModal: {
+          id: 'info-modal',
+          index: null,
+          title: '',
+          content: ''
+        },
+        timerModal: {
+          id: 'timer-modal',
+          index: null,
+          title: '',
+          content: ''
+        },
+        createModal: {
+          id: 'create-modal',
+          content: null
+        }
+      }
+    },
+    computed: {
+      sortOptions() {
+        // Create an options list from our fields
+        return this.fields
+          .filter(f => f.sortable)
+          .map(f => {
+            return { text: f.label, value: f.key }
+          })
+      }
+    },
+    mounted() {
+      // Set the initial number of items
+      this.totalRows = this.items.length
+    },
+    methods: {
+      info(item, index, button) {
+        this.deleteModal.index = index;
+        this.deleteModal.title = `Row index: ${item.name.first}`
+        this.deleteModal.content = item.description
+        this.$root.$emit('bv::show::modal', this.deleteModal.id, button)
+      },
+      timer(item, index, button) {
+        this.timerModal.index = index;
+        this.timerModal.title = ``
+        this.timerModal.content = item.description
+        this.$root.$emit('bv::show::modal', this.timerModal.id, button)
+      },
+      resetTimerModal() {
+        this.timerModal.index = null
+        this.timerModal.title = ''
+        this.timerModal.content = ''
+      },
+      resetDeleteModal() {
+        this.deleteModal.index = null
+        this.deleteModal.title = ''
+        this.deleteModal.content = ''
+      },
+      onFiltered(filteredItems) {
+        // Trigger pagination to update the number of buttons/pages due to filtering
+        this.totalRows = filteredItems.length
+        this.currentPage = 1
+      },
+      removeRow(index) {
+        console.log(index);
+        this.items = this.items.filter((item, i) => i !== index);
+        this.totalRows = this.items.length
+        this.$emit('input', this.totalRows);
+      },
+      create(button) {
+        this.createModal.index = 0;
+        this.createModal.title = `Crear nueva Tarea`
+        this.createModal.content = 'item.description'
+        this.$root.$emit('bv::show::modal', this.createModal.id, button)
+      },
+      resetCreateModal() {
+        console.log('Reseting  create modal');
+        this.createModal.index = null
+        this.createModal.title = ''
+        this.createModal.content = ''
+      },
+      createRow() {
+        console.log('Creating task');
+        // this.items = this.items.filter((item, i) => i !== index);
+        // this.totalRows = this.items.length
+        // this.$emit('input', this.totalRows);
+      },
+      addTimer() {
+        console.log('Adding time');
+        // this.items = this.items.filter((item, i) => i !== index);
+        // this.totalRows = this.items.length
+        // this.$emit('input', this.totalRows);
+      }
+    }
   }
-}
-</script>
-
-<style>
-body {
-  padding-top: 5rem;
-}
-.starter-template {
-  padding: 3rem 1.5rem;
-  text-align: center;
-}
-
-.header {
-    color: #36A0FF;
-    font-size: 27px;
-    padding: 10px;
-}
-
-.bigicon {
-    font-size: 35px;
-    color: #36A0FF;
-}
-
-/* css zona de tareas */
-body
-{margin-top:20px;
-  background-color:#eee;
-  }
-  .project-list-table {
-      border-collapse: separate;
-      border-spacing: 0 12px
-  }
-  
-  .project-list-table tr {
-      background-color: #fff
-  }
-  
-  .table-nowrap td, .table-nowrap th {
-      white-space: nowrap;
-  }
-  .table-borderless>:not(caption)>*>* {
-      border-bottom-width: 0;
-  }
-  .table>:not(caption)>*>* {
-      padding: 0.75rem 0.75rem;
-      background-color: var(--bs-table-bg);
-      border-bottom-width: 1px;
-      box-shadow: inset 0 0 0 9999px var(--bs-table-accent-bg);
-  }
-  
-  .avatar-sm {
-      height: 2rem;
-      width: 2rem;
-  }
-  .rounded-circle {
-      border-radius: 50%!important;
-  }
-  .me-2 {
-      margin-right: 0.5rem!important;
-  }
-  a {
-      color: #3b76e1;
-      text-decoration: none;
-  }
-  
-  .badge-soft-danger {
-      color: #f56e6e !important;
-      background-color: rgba(245,110,110,.1);
-  }
-  .badge-soft-success {
-      color: #63ad6f !important;
-      background-color: rgba(99,173,111,.1);
-  }
-  
-  .badge-soft-primary {
-      color: #3b76e1 !important;
-      background-color: rgba(59,118,225,.1);
-  }
-  
-  .badge-soft-info {
-      color: #57c9eb !important;
-      background-color: rgba(87,201,235,.1);
-  }
-  
- 
-  .bg-soft-primary {
-      background-color: rgba(59,118,225,.25)!important;
-  }
-</style>
+  </script>
+    
+  <style>
+  </style>

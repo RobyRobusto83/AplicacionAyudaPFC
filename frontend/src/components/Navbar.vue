@@ -13,9 +13,6 @@
           <a class="nav-link" href="#/tasks">Tareas</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#/Working">Working</a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link" href="#/about">About us</a>
         </li>
       </ul>
