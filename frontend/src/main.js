@@ -6,6 +6,7 @@ import Home from './pages/Home.vue'
 import PFC from './pages/PFC.vue'
 import TaskList from './pages/Tasks.vue'
 import WorkingArea from './pages/Working.vue'
+import TimerPage from './pages/TimerPage.vue'
 import TaskForm from './pages/TaskForm.vue'
 import AboutUs from './pages/AboutUs.vue'
 
@@ -31,6 +32,7 @@ const routes = [
   { path: '/tasks', component: TaskList },
   { path: '/Working', component: WorkingArea },
   { path: '/TaskForm', component: TaskForm },
+  { path: '/timer', component: TimerPage },
   { path: '/about', component: AboutUs },
 ]
 const router = new VueRouter({

@@ -171,7 +171,7 @@
             <b-icon icon="trash"></b-icon>
         </b-button>
         <b-button size="sm" class="mr-1" variant="outline-success">
-            <b-icon icon="clock"></b-icon>
+          <a href="#/timer" data-bs-toggle="tooltip" data-bs-placement="top" title="Time"><b-icon icon="clock"></b-icon></a>
         </b-button>
         <b-button size="sm" @click="row.toggleDetails" variant="outline-secondary">
             <b-icon v-if="row.detailsShowing" icon="eye-slash"/><b-icon v-else icon="eye"/>
