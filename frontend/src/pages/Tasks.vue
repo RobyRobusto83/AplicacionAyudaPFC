@@ -15,7 +15,7 @@
     <b-row>
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Sort"
+          label="Ordenar por"
           label-for="sort-by-select"
           label-cols-sm="3"
           label-align-sm="right"
@@ -32,7 +32,7 @@
               class="w-75"
             >
               <template #first>
-                <option value="">-- none --</option>
+                <option value="">Elige una</option>
               </template>
             </b-form-select>
 
@@ -43,8 +43,8 @@
               size="sm"
               class="w-25"
             >
-              <option :value="false">Asc</option>
-              <option :value="true">Desc</option>
+              <option :value="false">Ascender</option>
+              <option :value="true">Descender</option>
             </b-form-select>
           </b-input-group>
         </b-form-group>
@@ -52,7 +52,7 @@
 
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Initial sort"
+          label="Orden inicial"
           label-for="initial-sort-select"
           label-cols-sm="3"
           label-align-sm="right"
@@ -62,7 +62,7 @@
           <b-form-select
             id="initial-sort-select"
             v-model="sortDirection"
-            :options="['asc', 'desc', 'last']"
+            :options="['ascender', 'descender', 'último']"
             size="sm"
           ></b-form-select>
         </b-form-group>
@@ -70,7 +70,7 @@
 
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Filter"
+          label="Filtrar"
           label-for="filter-input"
           label-cols-sm="3"
           label-align-sm="right"
@@ -82,11 +82,11 @@
               id="filter-input"
               v-model="filter"
               type="search"
-              placeholder="Type to Search"
+              placeholder="Tipo de búsqueda"
             ></b-form-input>
 
             <b-input-group-append>
-              <b-button :disabled="!filter" @click="filter = ''">Clear</b-button>
+              <b-button :disabled="!filter" @click="filter = ''">Limpiar</b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
@@ -95,8 +95,8 @@
       <b-col lg="6" class="my-1">
         <b-form-group
           v-model="sortDirection"
-          label="Filter On"
-          description="Leave all unchecked to filter on all data"
+          label="Filtrar por"
+          description="No marques ninguna para ver todos los datos"
           label-cols-sm="3"
           label-align-sm="right"
           label-size="sm"
@@ -117,7 +117,7 @@
 
       <b-col sm="5" md="6" class="my-1">
         <b-form-group
-          label="Per page"
+          label="Número de páginas"
           label-for="per-page-select"
           label-cols-sm="6"
           label-cols-md="4"
