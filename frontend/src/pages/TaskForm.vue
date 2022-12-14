@@ -8,7 +8,7 @@
       >
         <b-form-input
           id="input-1"
-          v-model="form.name"
+          v-model="form.itemTitle"
           type="name"
           required
         ></b-form-input>
@@ -17,7 +17,7 @@
       <b-form-group id="input-group-2" label="Descripción" label-for="input-2">
           <b-form-textarea
               id="input-2"
-              v-model="form.description"
+              v-model="form.itemDescription"
               placeholder="Descripción"
               rows="3"
               max-rows="6"
@@ -28,7 +28,7 @@
       <b-form-group id="input-group-3" label="Prioridades" label-for="input-3">
         <b-form-select
           id="input-3"
-          v-model="form.priority"
+          v-model="form.itemPriority"
           :options="prioritys"
           required
         ></b-form-select>
@@ -45,20 +45,16 @@
 //import TaskItem from '@/components/TaskItem.vue'
 
   export default {
+
     data() {
       return {
-        form: {
-          name: '',
-          description: '',
-          priority: null,
-          checked: []
-        },
         prioritys: [{ text: 'Seleccione una prioridad', value: null }, 'Alta', 'Media', 'Baja',],
         show: true
       }
     },
     methods: {
       onSubmit(event) {
+        console.log('Submmiting form')
         event.preventDefault()
         alert(JSON.stringify(this.form))
       },

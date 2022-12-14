@@ -1,21 +1,11 @@
 <template>
-    <div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="md-3">
-                    <h5 class="card-title">Listado de tareas</h5>
-                </div>
-                <div class="md-1">
-                  <b-button @click="create($event.target)">Nueva tarea</b-button>
-                </div>
-            </div>
-        </div>
-        <b-container fluid>
+<div>
+<b-container fluid>
     <!-- User Interface controls -->
     <b-row>
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Ordenar por"
+          label="Ordena"
           label-for="sort-by-select"
           label-cols-sm="3"
           label-align-sm="right"
@@ -32,7 +22,7 @@
               class="w-75"
             >
               <template #first>
-                <option value="">Elige una</option>
+                <option value="">sin orden</option>
               </template>
             </b-form-select>
 
@@ -43,8 +33,8 @@
               size="sm"
               class="w-25"
             >
-              <option :value="false">Ascender</option>
-              <option :value="true">Descender</option>
+              <option :value="false">Asc</option>
+              <option :value="true">Desc</option>
             </b-form-select>
           </b-input-group>
         </b-form-group>
@@ -52,7 +42,7 @@
 
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Orden inicial"
+          label="Orden"
           label-for="initial-sort-select"
           label-cols-sm="3"
           label-align-sm="right"
@@ -62,7 +52,7 @@
           <b-form-select
             id="initial-sort-select"
             v-model="sortDirection"
-            :options="['ascender', 'descender', 'último']"
+            :options="['asc', 'desc', 'last']"
             size="sm"
           ></b-form-select>
         </b-form-group>
@@ -82,7 +72,6 @@
               id="filter-input"
               v-model="filter"
               type="search"
-              placeholder="Tipo de búsqueda"
             ></b-form-input>
 
             <b-input-group-append>
@@ -96,7 +85,6 @@
         <b-form-group
           v-model="sortDirection"
           label="Filtrar por"
-          description="No marques ninguna para ver todos los datos"
           label-cols-sm="3"
           label-align-sm="right"
           label-size="sm"
@@ -117,7 +105,7 @@
 
       <b-col sm="5" md="6" class="my-1">
         <b-form-group
-          label="Número de páginas"
+          label="Por página"
           label-for="per-page-select"
           label-cols-sm="6"
           label-cols-md="4"
@@ -135,7 +123,11 @@
         </b-form-group>
       </b-col>
 
-      <b-col sm="7" md="6" class="my-1">
+       <b-col sm="7" md="2" class="my-1">
+        <b>Tareas</b>: {{ totalRows }}
+      </b-col>
+      
+      <b-col sm="7" md="3" class="my-1">
         <b-pagination
           v-model="currentPage"
           :total-rows="totalRows"
@@ -145,6 +137,11 @@
           class="my-0"
         ></b-pagination>
       </b-col>
+
+      <b-col sm="7" md="1" class="my-1">
+        <b-button class="btn btn-success" @click="create($event.target)"><b-icon icon="plus"/></b-button>
+      </b-col>
+      
     </b-row>
 
     <!-- Main table element -->
@@ -163,15 +160,11 @@
       small
       @filtered="onFiltered"
     >
-      <template #cell(name)="row">
-        {{ row.value.first }} {{ row.value.last }}
-      </template>
-
       <template #cell(actions)="row">
-        <b-button size="sm" class="mr-1" variant="outline-primary">
+        <b-button size="sm"  @click="infoEditModal(row.item, row.index, $event.target)" class="mr-1" variant="outline-primary">
             <b-icon icon="pen-fill"/>
         </b-button>
-        <b-button size="sm" @click="info(row.item, row.index, $event.target)" class="mr-1" variant="outline-danger">
+        <b-button size="sm" @click="infoDeleteModal(row.item, row.index, $event.target)" class="mr-1" variant="outline-danger">
             <b-icon icon="trash"/>
         </b-button>
         <b-button size="sm" @click="timer(row.item, row.index, $event.target)" class="mr-1" variant="outline-success">
@@ -197,69 +190,45 @@
     </b-modal>    
 
     <!-- Create modal -->
-    <b-modal :id="createModal.id" :title="createModal.title" @hide="resetCreateModal" @ok="createRow" >
-      <template #modal-header="{ close }">
-        <!-- Emulate built in modal header close button action -->
-        <h5>Nueva tarea</h5>
-        <button type="button" aria-label="Close" class="close" @click="close()">×</button>
-      </template>
-
-      <template>
-          <TaskForm />
-      </template>
-
-      <template #modal-footer="{ ok, hide}">
-        <!-- Emulate built in modal footer ok and cancel button actions -->
-        <b-button size="sm" variant="success" @click="ok()">Guardar</b-button>
-        <!-- Button with custom close trigger value -->
-        <b-button size="sm" variant="outline-secondary" @click="hide()">Cancelar</b-button>
-      </template>
-    </b-modal>
-
-    <b-modal :id="timerModal.id" :title="timerModal.title" @hide="resetTimerModal" @ok="addTimer(timerModal.index)">
-        <TimerClock />
-    </b-modal>  
-  </b-container>
-    </div>
-  </template>
+    <CreateTaskModal :id="createModal.id" :title="createModal.title" v-bind:formData="newTask" @createdTask="createRow" @resetedNewTask="resetCreateModal"/>
     
-  <script>  
-  import TaskForm from "@/components/task/TaskForm.vue"
+    <!-- Edit modal -->
+    <EditTaskModal :id="editModal.id" :title="editModal.title" v-bind:formData="updateTask" @createdTask="updateRow" @resetedNewTask="resetUpdateModal"/>
+    
+
+  <b-modal :id="timerModal.id" :title="timerModal.title" @hide="resetTimerModal" @ok="addTimer(timerModal.index)">
+    <TimerClock />
+</b-modal>
+</b-container>
+    </div>
+</template>
+    
+<script>  
+  import { v4 as uuidv4 } from 'uuid';
+  import CreateTaskModal from "@/components/task/CreateTaskModal.vue"
+  import EditTaskModal from "@/components/task/EditTaskModal.vue"
+  // import TaskForm from "@/components/task/TaskForm.vue"
   import TimerClock from "@/components/task/TimerClock.vue"
 
   export default {
     name: 'TaskList',
     components: {
-      TaskForm,
-      TimerClock
+      CreateTaskModal,
+      // TaskForm,
+      TimerClock,
+      EditTaskModal
+    },
+    created() {
+      this.$store.dispatch('tasks/fetchTasks');
+        this.totalRows = this.items.length
+        this.$emit('input', this.totalRows);
+    },
+    mounted() {
+      // Set the initial number of items
+      this.totalRows = this.items.length
     },
     data() {
       return {
-        items: [
-          { isCompleted: true, name: { first: 'Dickerson', last: 'Macdonald' }, description: "Lorem ipsum", priority: "Alta", _rowVariant: 'danger' },
-          { isCompleted: false, name: { first: 'Larsen', last: 'Shaw' }, description: "Mauris auctor mattis ", priority: "Media", _rowVariant: 'warning'  },
-          {
-            isCompleted: false,
-            name: { first: 'Mini', last: 'Navarro' }, 
-            description: "Proin fermentum mi sed", 
-            priority: "Alta" ,
-            _rowVariant: 'success'
-          },
-          { isCompleted: false, name: { first: 'Geneva', last: 'Wilson' }, description: "Nam in tempor massa.", priority: "Alta"  },
-          { isCompleted: true,  name: { first: 'Jami', last: 'Carney' }, description: "In aliquet lacinia ornare", priority: "Baja"  },
-          { isCompleted: false,  name: { first: 'Essie', last: 'Dunlap' }, description: "Cras interdum malesuada odio", priority: "Alta"  },
-          { isCompleted: true,  name: { first: 'Thor', last: 'Macdonald' }, description: "Vivamus pharetra arcu id neque", priority: "Alta"  },
-          {
-            isCompleted: true,
-            name: { first: 'Larsen', last: 'Shaw' }, 
-            description: "Curabitur eget fermentum ex", 
-            priority: "Baja" 
-          },
-          { isCompleted: false, name: { first: 'Mitzi', last: 'Navarro' }, description: "Etiam ac lacus lorem.", priority: "Alta"  },
-          { isCompleted: false, name: { first: 'Genevieve', last: 'Wilson' } , description: "Vestibulum ante ipsum primis", priority: "Media" },
-          { isCompleted: true,  name: { first: 'John', last: 'Carney' } , description: "Fusce viverra non leo vel tincidunt", priority: "Baja" },
-          { isCompleted: false, name: { first: 'Dick', last: 'Dunlap' } , description: "Curabitur lorem eros", priority: "Alta" }
-        ],
         fields: [
           { key: 'name', label: 'Nombre', sortable: true, sortDirection: 'desc' },
           { key: 'description', label: 'Descripción', sortable: true, sortDirection: 'desc' },
@@ -279,20 +248,15 @@
         totalRows: 1,
         currentPage: 1,
         perPage: 5,
-        pageOptions: [5, 10, 15, { value: 100, text: "Show a lot" }],
+        pageOptions: [5, 10, 15, { value: 100, text: "Mostrar todas" }],
         sortBy: '',
         sortDesc: false,
         sortDirection: 'asc',
         filter: null,
         filterOn: [],
+        firmData: '',
         deleteModal: {
-          id: 'info-modal',
-          index: null,
-          title: '',
-          content: ''
-        },
-        timerModal: {
-          id: 'timer-modal',
+          id: 'delete-modal',
           index: null,
           title: '',
           content: ''
@@ -300,6 +264,28 @@
         createModal: {
           id: 'create-modal',
           content: null
+        },
+        newTask: {
+          uuid: uuidv4(),
+          title: '',
+          description: '',
+          priority: 'Baja'
+        },
+        editModal: {
+          id: 'edit-modal',
+          content: null
+        },
+        updateTask: {
+          id: uuidv4(),
+          title: '',
+          description: '',
+          priority: ''
+        },
+        timerModal: {
+          id: 'timer-modal',
+          index: null,
+          title: '',
+          content: ''
         }
       }
     },
@@ -311,18 +297,94 @@
           .map(f => {
             return { text: f.label, value: f.key }
           })
+      },
+      items() {
+        return this.$store.state.tasks.tasks
       }
     },
-    mounted() {
-      // Set the initial number of items
-      this.totalRows = this.items.length
-    },
     methods: {
-      info(item, index, button) {
+      onFiltered(filteredItems) {
+        // Trigger pagination to update the number of buttons/pages due to filtering
+        this.totalRows = filteredItems.length
+        this.currentPage = 1
+      },
+      infoDeleteModal(item, index, button) {
         this.deleteModal.index = index;
-        this.deleteModal.title = `Row index: ${item.name.first}`
+        this.deleteModal.title = `Row index: ${item.name}`
         this.deleteModal.content = item.description
         this.$root.$emit('bv::show::modal', this.deleteModal.id, button)
+      },
+      resetDeleteModal() {
+        this.deleteModal.index = null
+        this.deleteModal.title = ''
+        this.deleteModal.content = ''
+      },
+      removeRow(index) {
+        console.log(index);
+        const currentRow = this.items.filter((item, i) => i == index);
+        console.log(currentRow[0]);
+        // this.items = this.items.filter((item, i) => i !== index);
+        // this.totalRows = this.items.length
+        // this.$emit('input', this.totalRows);
+      },
+      create(button) {
+        this.createModal.index = 0;
+        this.createModal.title = `Crear nueva Tarea`
+        this.createModal.content = 'item.description'
+        this.form = {
+          itemTitle: 'Test',
+          itemDescription: 'Testing',
+          itepPriority: 'Baja'
+        }
+        this.$root.$emit('bv::show::modal', this.createModal.id, button)
+      },
+      resetCreateModal() {
+        console.log('Reseting create modal');
+        this.createModal.index = null
+        this.createModal.title = ''
+        this.createModal.content = ''
+      },
+      createRow(newTask) {
+        var newTaskRow = {
+          uuid: newTask.uuid, 
+          isCompleted: false, 
+          name: newTask.title, 
+          description: newTask.description, 
+          priority: newTask.priority, 
+          _rowVariant: 'success' 
+        }
+        this.$store.dispatch('tasks/addNewTask', newTaskRow)
+        // this.items.push(newTaskRow);
+        this.totalRows = this.items.length
+        this.$emit('input', this.totalRows);
+      },
+      infoEditModal(item, index, button) {
+        this.editModal.index = 0;
+        this.editModal.title = `Modificar Tarea`
+        this.editModal.content = 'item.description'
+        this.updateTask = {
+          itemTitle: 'Updatet',
+          itemDescription: 'Changing',
+          itepPriority: 'Alta'
+        }
+        this.$emit('input', this.updateTask);
+        this.$root.$emit('bv::show::modal', this.editModal.id, button)
+      },
+      editRow(event) {
+        console.log('Editing task');
+        console.log(event);
+        console.log(this.form);
+        event.preventDefault()
+        alert(JSON.stringify(this.newTask))
+        // this.items = this.items.filter((item, i) => i !== index);
+        // this.totalRows = this.items.length
+        // this.$emit('input', this.totalRows);
+      },
+      resetEditModal() {
+        console.log('Reseting edit modal');
+        this.editModalModal.index = null
+        this.editModalModal.title = ''
+        this.editModalModal.content = ''
       },
       timer(item, index, button) {
         this.timerModal.index = index;
@@ -335,40 +397,6 @@
         this.timerModal.title = ''
         this.timerModal.content = ''
       },
-      resetDeleteModal() {
-        this.deleteModal.index = null
-        this.deleteModal.title = ''
-        this.deleteModal.content = ''
-      },
-      onFiltered(filteredItems) {
-        // Trigger pagination to update the number of buttons/pages due to filtering
-        this.totalRows = filteredItems.length
-        this.currentPage = 1
-      },
-      removeRow(index) {
-        console.log(index);
-        this.items = this.items.filter((item, i) => i !== index);
-        this.totalRows = this.items.length
-        this.$emit('input', this.totalRows);
-      },
-      create(button) {
-        this.createModal.index = 0;
-        this.createModal.title = `Crear nueva Tarea`
-        this.createModal.content = 'item.description'
-        this.$root.$emit('bv::show::modal', this.createModal.id, button)
-      },
-      resetCreateModal() {
-        console.log('Reseting  create modal');
-        this.createModal.index = null
-        this.createModal.title = ''
-        this.createModal.content = ''
-      },
-      createRow() {
-        console.log('Creating task');
-        // this.items = this.items.filter((item, i) => i !== index);
-        // this.totalRows = this.items.length
-        // this.$emit('input', this.totalRows);
-      },
       addTimer() {
         console.log('Adding time');
         // this.items = this.items.filter((item, i) => i !== index);
@@ -377,7 +405,7 @@
       }
     }
   }
-  </script>
+</script>
     
-  <style>
-  </style>
+<style>
+</style>

@@ -1,6 +1,6 @@
 <template>
 <div>
-    <b-form @submit="onSubmit" @reset="onReset" v-if="show">
+    <b-form v-if="show">
         <b-form-group
             id="input-group-1"
             label="Nombre"
@@ -38,36 +38,39 @@
 
 <script>
 export default {
+    props: {
+        formData: {
+            title: String,
+            description: String,
+            priority: String
+        }
+    },
     data() {
-    return {
-        form: {
-            name: '',
-            description: '',
-            priority: null,
-            checked: []
-        },
-        prioritys: [{ text: 'Seleccione una prioridad', value: null }, 'Alta', 'Media', 'Baja',],
-        show: true
-    }
+        return {
+            form: {
+                name: this.formData.title,
+                description: this.formData.description,
+                priority: this.formData.priority
+            },
+            prioritys: [{ text: 'Seleccione una prioridad', value: null }, 'Alta', 'Media', 'Baja',],
+            show: true
+        }
     },
     methods: {
-        onSubmit(event) {
-            event.preventDefault()
-            alert(JSON.stringify(this.form))
-        },
-        onReset(event) {
-            event.preventDefault()
-            // Reset our form values
-            this.form.email = ''
-            this.form.name = ''
-            this.form.food = null
-            this.form.checked = []
-            // Trick to reset/clear native browser form validation state
-            this.show = false
-            this.$nextTick(() => {
-            this.show = true
-            })
-        }
+        // onSubmit(event) {
+        //     event.preventDefault()
+        //     console.log('onSubmit')
+        //     alert(JSON.stringify(this.form))
+        // },
+        // onReset(event) {
+        //     console.log('onReset')
+        //     event.preventDefault()
+        // },
+        // onClose(event) {
+        //     console.log('onReset')
+        //     event.preventDefault()
+        //     this.$emit('chainClosedEvent', this.form)
+        // }
     }
 }
 </script>
