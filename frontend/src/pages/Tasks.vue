@@ -1,11 +1,21 @@
 <template>
-<div>
-<b-container fluid>
+    <div>
+        <div class="row">
+            <div class="col-10">
+                <div class="md-3">
+                    <h5 class="card-title">Listado de tareas</h5>
+                </div>
+                <div class="md-3">
+                  <b-button @click="create($event.target)">Nueva tarea</b-button>
+                </div>
+            </div>
+        </div>
+        <b-container fluid>
     <!-- User Interface controls -->
     <b-row>
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Ordena"
+          label="Sort"
           label-for="sort-by-select"
           label-cols-sm="3"
           label-align-sm="right"
@@ -22,7 +32,7 @@
               class="w-75"
             >
               <template #first>
-                <option value="">sin orden</option>
+                <option value="">-- none --</option>
               </template>
             </b-form-select>
 
@@ -42,7 +52,7 @@
 
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Orden"
+          label="Initial sort"
           label-for="initial-sort-select"
           label-cols-sm="3"
           label-align-sm="right"
@@ -60,7 +70,7 @@
 
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Filtrar"
+          label="Filter"
           label-for="filter-input"
           label-cols-sm="3"
           label-align-sm="right"
@@ -72,10 +82,11 @@
               id="filter-input"
               v-model="filter"
               type="search"
+              placeholder="Type to Search"
             ></b-form-input>
 
             <b-input-group-append>
-              <b-button :disabled="!filter" @click="filter = ''">Limpiar</b-button>
+              <b-button :disabled="!filter" @click="filter = ''">Clear</b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
@@ -84,7 +95,8 @@
       <b-col lg="6" class="my-1">
         <b-form-group
           v-model="sortDirection"
-          label="Filtrar por"
+          label="Filter On"
+          description="Leave all unchecked to filter on all data"
           label-cols-sm="3"
           label-align-sm="right"
           label-size="sm"
@@ -105,7 +117,7 @@
 
       <b-col sm="5" md="6" class="my-1">
         <b-form-group
-          label="Por página"
+          label="Per page"
           label-for="per-page-select"
           label-cols-sm="6"
           label-cols-md="4"
@@ -126,7 +138,7 @@
        <b-col sm="7" md="2" class="my-1">
         <b>Tareas</b>: {{ totalRows }}
       </b-col>
-      
+
       <b-col sm="7" md="3" class="my-1">
         <b-pagination
           v-model="currentPage"
@@ -137,11 +149,9 @@
           class="my-0"
         ></b-pagination>
       </b-col>
-
       <b-col sm="7" md="1" class="my-1">
         <b-button class="btn btn-success" @click="create($event.target)"><b-icon icon="plus"/></b-button>
       </b-col>
-      
     </b-row>
 
     <!-- Main table element -->
@@ -160,9 +170,15 @@
       small
       @filtered="onFiltered"
     >
+      <template v-slot:cell(name)="row" v-if="edit">
+        <b-form-input v-model="row.item.name"/>
+      </template>
+      <template v-slot:cell(description)="row" v-if="edit">
+        <b-form-input v-model="row.item.description"/>
+      </template>
       <template #cell(actions)="row">
-        <b-button size="sm"  @click="infoEditModal(row.item, row.index, $event.target)" class="mr-1" variant="outline-primary">
-            <b-icon icon="pen-fill"/>
+        <b-button size="sm"  @click="toggleEdit(row.index)" class="mr-1" variant="outline-primary">
+            <b-icon icon="pen-fill" v-if="!edit"/><b-icon icon="file-check" v-if="edit"/>
         </b-button>
         <b-button size="sm" @click="infoDeleteModal(row.item, row.index, $event.target)" class="mr-1" variant="outline-danger">
             <b-icon icon="trash"/>
@@ -193,35 +209,36 @@
     <CreateTaskModal :id="createModal.id" :title="createModal.title" v-bind:formData="newTask" @createdTask="createRow" @resetedNewTask="resetCreateModal"/>
     
     <!-- Edit modal -->
-    <EditTaskModal :id="editModal.id" :title="editModal.title" v-bind:formData="updateTask" @createdTask="updateRow" @resetedNewTask="resetUpdateModal"/>
+    <EditTaskModal :id="editModal.id" :title="editModal.title" v-bind:formUpdData="updateTask" />
+    <!-- @updatedTask="updateRow" @resetedUpdateTask="resetUpdateModal" -->
+   <!--   -->
     
-
-  <b-modal :id="timerModal.id" :title="timerModal.title" @hide="resetTimerModal" @ok="addTimer(timerModal.index)">
-    <TimerClock />
-</b-modal>
-</b-container>
+    <b-modal :id="timerModal.id" :title="timerModal.title" @hide="resetTimerModal" @ok="addTimer(timerModal.index)">
+        <TimerClock />
+    </b-modal>  
+  </b-container>
     </div>
 </template>
     
 <script>  
+// https://stackoverflow.com/questions/64629051/edit-row-in-vuejs-and-bootstrap-vue
+// https://muhimasri.com/blogs/part-4-load-add-update-and-delete-table-rows-using-api-services/
   import { v4 as uuidv4 } from 'uuid';
   import CreateTaskModal from "@/components/task/CreateTaskModal.vue"
   import EditTaskModal from "@/components/task/EditTaskModal.vue"
-  // import TaskForm from "@/components/task/TaskForm.vue"
   import TimerClock from "@/components/task/TimerClock.vue"
 
   export default {
     name: 'TaskList',
     components: {
       CreateTaskModal,
-      // TaskForm,
-      TimerClock,
-      EditTaskModal
+      EditTaskModal,
+      TimerClock
     },
     created() {
       this.$store.dispatch('tasks/fetchTasks');
-        this.totalRows = this.items.length
-        this.$emit('input', this.totalRows);
+      this.totalRows = this.items.length;
+      this.$emit('input', this.totalRows);
     },
     mounted() {
       // Set the initial number of items
@@ -245,10 +262,11 @@
           },
           { key: 'actions', label: 'Actions' }
         ],
-        totalRows: 1,
+        edit: false,
+        // totalRows: 1,
         currentPage: 1,
         perPage: 5,
-        pageOptions: [5, 10, 15, { value: 100, text: "Mostrar todas" }],
+        pageOptions: [5, 10, 15, { value: 100, text: "Show a lot" }],
         sortBy: '',
         sortDesc: false,
         sortDirection: 'asc',
@@ -300,6 +318,9 @@
       },
       items() {
         return this.$store.state.tasks.tasks
+      },
+      totalRows(){
+        return this.items.length
       }
     },
     methods: {
@@ -307,6 +328,10 @@
         // Trigger pagination to update the number of buttons/pages due to filtering
         this.totalRows = filteredItems.length
         this.currentPage = 1
+      },
+      toggleEdit(index){
+        console.log(index);
+        this.edit = !this.edit
       },
       infoDeleteModal(item, index, button) {
         this.deleteModal.index = index;
@@ -331,11 +356,7 @@
         this.createModal.index = 0;
         this.createModal.title = `Crear nueva Tarea`
         this.createModal.content = 'item.description'
-        this.form = {
-          itemTitle: 'Test',
-          itemDescription: 'Testing',
-          itepPriority: 'Baja'
-        }
+       
         this.$root.$emit('bv::show::modal', this.createModal.id, button)
       },
       resetCreateModal() {
@@ -363,11 +384,12 @@
         this.editModal.title = `Modificar Tarea`
         this.editModal.content = 'item.description'
         this.updateTask = {
-          itemTitle: 'Updatet',
-          itemDescription: 'Changing',
-          itepPriority: 'Alta'
+          uuid: uuidv4(),
+          title: 'Updatet',
+          description: 'Changing',
+          priority: 'Alta'
         }
-        this.$emit('input', this.updateTask);
+        this.$root.$emit('input', this.updateTask);
         this.$root.$emit('bv::show::modal', this.editModal.id, button)
       },
       editRow(event) {
