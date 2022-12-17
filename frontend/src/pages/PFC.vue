@@ -1,5 +1,6 @@
 <template>
   <div>
+    <RichTextEditor/>
     <b-list-group>
       <ChapterPfc
         v-for="chapter in pfc.chapters"
@@ -13,11 +14,14 @@
 <script>
 import ChapterPfc from '../components/ChapterPfc.vue'
 import dataPFC from '../data/pfc_data.js'
+import RichTextEditor from '../components/pfc/RichTextEditor.vue'
+
 
 export default {
   name: 'PFC',
   components: {
-    ChapterPfc
+    ChapterPfc,
+    RichTextEditor
   },
   data() {
     return {
