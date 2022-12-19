@@ -8,12 +8,12 @@ services:
         volumes:
             - "./docker_data/mysql:/var/lib/mysql"
         environment:
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-            MYSQL_DATABASE: ${MYSQL_DATABASE}
-            MYSQL_USER: ${MYSQL_USER}
-            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_ROOT_PASSWORD: m1nd4
+            MYSQL_DATABASE: app_db
+            MYSQL_USER: app_user
+            MYSQL_PASSWORD: app_pass
         ports:
-            - 3306:3306
+            - 6603:3306
         networks:
             - symfony
         env_file:
@@ -22,9 +22,11 @@ services:
         build:
             context: ./infrastructure/docker/php
             args:
-                TIMEZONE: ${TIMEZONE}
+                TIMEZONE: 'Europe/Madrid'
         volumes:
             - ./symfony:/var/www/symfony/
+        ports:
+            - 9000:9000
         networks:
             - symfony
     nginx:
@@ -36,15 +38,13 @@ services:
             - 9980:80
         networks:
             - symfony
-        env_file:
-            - ./infrastructure/.env.nginx
     frontend:
         container_name: frontend
         image: node:lts
         working_dir: /var/www/html/app/
         entrypoint: /bin/bash
         ports:
-            - "8080:8080"
+            - 8080:8080
         volumes:
             - ./frontend/:/var/www/html/app
         tty: true
