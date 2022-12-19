@@ -6,7 +6,8 @@ import Vuex from 'vuex'
 // https://itnext.io/managing-state-in-vue-js-with-vuex-f036fd71f432
 // https://markus.oberlehner.net/blog/how-to-structure-a-complex-vuex-store/ <== REVISAME
 
-import tasks from './modules/tasks'
+import tasks from '@/store/modules/tasks'
+import pfc from '@/store/modules/pfc'
 
 Vue.use(Vuex)
 
@@ -20,7 +21,8 @@ export default new Vuex.Store({
     actions: {
     },
     modules: {
-        tasks
+        tasks,
+        pfc
     },
     strict: debug
 })

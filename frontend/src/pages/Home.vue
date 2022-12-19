@@ -1,15 +1,14 @@
 <template>
-  <div class="starter-template">
-    <h1>Título del proyecto</h1>
-    <p class="lead">No has definido un PFC</p>          
-    <a href="#/pfc" class="btn btn-primary btn-lg" role="button" aria-disabled="true">Defínelo</a>
-  </div>
+  <PFCViewer />
 </template>
 
 <script>
+import PFCViewer from '@/components/pfcViewer/PFCViewer.vue'
+
 export default {
   name: 'App',
   components: {
+    PFCViewer
   }
 }
 </script>

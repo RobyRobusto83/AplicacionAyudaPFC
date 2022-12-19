@@ -1,0 +1,9 @@
+### get Document
+GET http://localhost:9980/api/pfc/getContent
+Content-Type: application/json
+
+### get Schedule tasks
+GET http://localhost:9980/api/schedule/tasks
+Content-Type: application/json
+
+

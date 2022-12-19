@@ -1,28 +1,10 @@
-import schedule from '@/api/schedule'
+// import schedule from '@/api/schedule'
+import axios from "axios";
 
 // initial state
 const state = {
   tasks: []
 };
-
-// getters
-const getters = {
-    tasksList(state) {
-      return state.tasks;
-    }
-}
-
-// actions
-const actions = {
-  fetchTasks ({ commit }) {
-    schedule.getTasks(tasks => {
-      commit('SET_TASKS', tasks)
-    })
-  },
-  addNewTask (context, newTask) {
-      context.commit('ADD_TASK', newTask);
-  }
-}
 
 // mutations
 const mutations = {
@@ -36,6 +18,35 @@ const mutations = {
       state.tasks.filter(task => task.uuid !== id),
       state.tasks.splice(task => task.id, 1)
   }
+}
+
+// getters
+const getters = {
+    tasksList(state) {
+      return state.tasks;
+    }
+}
+
+// actions
+const actions = {
+  // fetchTasks ({ commit }) {
+  //   schedule.getTasks(tasks => {
+  //     commit('SET_TASKS', tasks)
+  //   })
+  // },
+  addNewTask (context, newTask) {
+      context.commit('ADD_TASK', newTask);
+  },
+  async fetchTasks ({ commit }) {
+    try {
+      const data = await axios.get(
+        "http://localhost:9980/api/schedule/tasks"
+      );
+      commit("SET_TASKS", data.data.tasks);
+    } catch (error) {
+      console.log(error);
+    }
+  },
 }
 
 export default {

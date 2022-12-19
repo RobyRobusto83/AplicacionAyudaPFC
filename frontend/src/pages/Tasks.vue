@@ -155,6 +155,64 @@
     </b-row>
 
     <!-- Main table element -->
+    <!-- <b-table
+      :items="items"
+      :fields="fields"
+      :current-page="currentPage"
+      :per-page="perPage"
+      :filter="filter"
+      :filter-included-fields="filterOn"
+      :sort-by.sync="sortBy"
+      :sort-desc.sync="sortDesc"
+      :sort-direction="sortDirection"
+      stacked="md"
+      show-empty
+      small
+      @filtered="onFiltered"
+    >
+      <template v-for="(field, index) in fields" #[`cell(${field.key})`]="data">
+        <b-form-datepicker
+          v-if="field.type === 'date' && items[data.index].isEdit"
+          :key="index"
+          :type="field.type"
+          :value="items[data.index][field.key]"
+          @input="(value) => inputHandler(value, data.index, field.key)"
+        ></b-form-datepicker>
+        <b-form-select
+          v-else-if="field.type === 'select' && items[data.index].isEdit"
+          :key="index"
+          :value="items[data.index][field.key]"
+          @input="(value) => inputHandler(value, data.index, field.key)"
+          :options="field.options"
+        ></b-form-select>
+        <b-checkbox
+          v-else-if="field.key === 'selectRow'"
+          :checked="items[data.index].isSelected"
+          :key="index"
+          @change="selectRowHandler(data)"
+        ></b-checkbox>
+        <div :key="index" v-else-if="field.type === 'edit'">
+          <b-button @click="editRowHandler(data)">
+            <span v-if="!items[data.index].isEdit">Edit</span>
+            <span v-else>Done</span>
+          </b-button>
+          <b-button
+            class="delete-button"
+            variant="danger"
+            @click="removeRowHandler(data.index)"
+            >Remove</b-button
+          >
+        </div>
+        <b-form-input
+          v-else-if="field.type && items[data.index].isEdit"
+          :key="index"
+          :type="field.type"
+          :value="items[data.index][field.key]"
+          @blur="(e) => inputHandler(e.target.value, data.index, field.key)"
+        ></b-form-input>
+        <span :key="index" v-else>{{ data.value }}</span>
+      </template>
+    </b-table> -->
     <b-table
       :items="items"
       :fields="fields"
@@ -170,15 +228,15 @@
       small
       @filtered="onFiltered"
     >
-      <template v-slot:cell(name)="row" v-if="edit">
-        <b-form-input v-model="row.item.name"/>
+      <template v-slot:cell(name)="row">
+        <b-card-text v-if="!row.item.isEdit">{{ row.item.name }}</b-card-text><b-form-input v-model="row.item.name" v-if="row.item.isEdit"/>
       </template>
       <template v-slot:cell(description)="row" v-if="edit">
         <b-form-input v-model="row.item.description"/>
       </template>
       <template #cell(actions)="row">
         <b-button size="sm"  @click="toggleEdit(row.index)" class="mr-1" variant="outline-primary">
-            <b-icon icon="pen-fill" v-if="!edit"/><b-icon icon="file-check" v-if="edit"/>
+            <b-icon icon="pen-fill" v-if="!row.item.isEdit"/><b-icon icon="file-check" v-if="row.item.isEdit"/>
         </b-button>
         <b-button size="sm" @click="infoDeleteModal(row.item, row.index, $event.target)" class="mr-1" variant="outline-danger">
             <b-icon icon="trash"/>
@@ -237,8 +295,8 @@
     },
     created() {
       this.$store.dispatch('tasks/fetchTasks');
-      this.totalRows = this.items.length;
-      this.$emit('input', this.totalRows);
+      // this.totalRows = this.items.length;
+      // this.$emit('input', this.totalRows);
     },
     mounted() {
       // Set the initial number of items
@@ -247,9 +305,9 @@
     data() {
       return {
         fields: [
-          { key: 'name', label: 'Nombre', sortable: true, sortDirection: 'desc' },
-          { key: 'description', label: 'Descripción', sortable: true, sortDirection: 'desc' },
-          { key: 'priority', label: 'Prioridad', sortable: true, class: 'text-center' },
+          { key: 'name', label: 'Nombre', sortable: true, sortDirection: 'desc', type: "text" },
+          { key: 'description', label: 'Descripción', sortable: true, sortDirection: 'desc', type: "text" },
+          { key: 'priority', label: 'Prioridad', sortable: true, class: 'text-center', type: "select" },
           {
             key: 'isCompleted',
             label: 'Completada',
@@ -258,9 +316,10 @@
             },
             sortable: true,
             sortByFormatted: true,
-            filterByFormatted: true
+            filterByFormatted: true,
+            type: "selectRow"
           },
-          { key: 'actions', label: 'Actions' }
+          { key: 'actions', label: 'Actions', type: "edit" }
         ],
         edit: false,
         // totalRows: 1,
@@ -317,13 +376,26 @@
           })
       },
       items() {
-        return this.$store.state.tasks.tasks
+        var data = this.$store.state.tasks.tasks;
+        data.forEach(function (row) {
+          row.isEdit = false;
+          row.isSelected = false;
+        });
+        return data;
       },
       totalRows(){
         return this.items.length
       }
     },
     methods: {
+    editRowHandler(data) {
+      this.items[data.index].isEdit = !this.items[data.index].isEdit;
+      console.log(this.items[data.index]);
+    },
+    selectRowHandler(data) {
+      this.items[data.index].isSelected =
+        !this.items[data.index].isSelected;
+    },
       onFiltered(filteredItems) {
         // Trigger pagination to update the number of buttons/pages due to filtering
         this.totalRows = filteredItems.length
@@ -331,7 +403,10 @@
       },
       toggleEdit(index){
         console.log(index);
-        this.edit = !this.edit
+        console.log(this.items[index].isEdit);
+        this.items[index].isEdit = !this.items[index].isEdit;
+        console.log(this.items[index].isEdit);
+        this.$emit('input', this.items[index]);
       },
       infoDeleteModal(item, index, button) {
         this.deleteModal.index = index;

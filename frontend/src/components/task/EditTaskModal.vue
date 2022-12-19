@@ -15,7 +15,7 @@
             >
                 <b-form-input
                 id="input-1"
-                v-model="form.title"
+                v-model="formUpd.title"
                 required
                 ></b-form-input>
             </b-form-group>
@@ -23,7 +23,7 @@
             <b-form-group id="input-group-2" label="Descripción" label-for="input-2">
                 <b-form-textarea
                     id="input-2"
-                    v-model="form.description"
+                    v-model="formUpd.description"
                     placeholder="Descripción"
                     rows="3"
                     max-rows="6"
@@ -34,7 +34,7 @@
             <b-form-group id="input-group-3" label="Prioridades" label-for="input-3">
                 <b-form-select
                 id="input-3"
-                v-model="form.priority"
+                v-model="formUpd.priority"
                 :options="prioritys"
                 required
                 ></b-form-select>
@@ -52,12 +52,11 @@
 </template>
 
 <script>
-
 export default {
     props: {
         id: String,
         title: String,
-        formData: {
+        formUpdData: {
             uuid: String,
             title: String,
             description: String,
@@ -66,11 +65,11 @@ export default {
     },
     data() {
         return {
-            form: {
-                uuid: this.formData.uuid,
-                title: this.formData.title,
-                description: this.formData.description,
-                priority: this.formData.priority
+            formUpd: {
+                uuid: this.formUpdData.uuid,
+                title: this.formUpdData.title,
+                description: this.formUpdData.description,
+                priority: this.formUpdData.priority
             },
             prioritys: [{ text: 'Seleccione una prioridad', value: null }, 'Alta', 'Media', 'Baja',],
             show: true
@@ -78,16 +77,24 @@ export default {
     },
     methods: {
         onOk() {
-            this.$emit('updateTask', this.form);
+            this.$emit('updatedTask', this.formUpd);
             this.$root.$emit('bv::hide::modal', this.id);
         },
         onHide() {
             this.$emit('resetedUpdateTask');
             this.$root.$emit('bv::hide::modal', this.id);
-        }
-    },
-    updated() {
-        
+        },
+    }, 
+    mount () {
+        console.log('Visual data XXXX');
+        console.log(this.formUpdData);
+        this.formUpd.uuid = this.formUpdData.uuid;
+        this.formUpd.title = this.formUpdData.title;
+        this.formUpd.description = this.formUpdData.description;
+        this.formUpd.priority = this.formUpdData.priority;
+        console.log('Updated data');
+        console.log(this.formUpd);
+        this.$forceUpdate();
     }
 }
 </script>
