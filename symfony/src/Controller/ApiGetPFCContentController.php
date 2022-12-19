@@ -4,19 +4,23 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Document;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
 
-class ApiGetPFCContentController
+class ApiGetPFCContentController extends AbstractController
 {
     #[Route('/api/pfc/getContent', name: 'pfc_get_content', methods: ['GET'])]
-    public function __invoke(Request $request): Response
+    public function getContent(ManagerRegistry $doctrine, Request $request): Response
     {
         try {
-            $data = $this->getData();
+//            $data = $this->getData();
+            $data = $this->getFromDatabase($doctrine);
         } catch (Throwable $e) {
             return new JsonResponse(
                 [
@@ -33,6 +37,15 @@ class ApiGetPFCContentController
             ['Content-type' => 'application/' . $request->getContentType()]
         );
 
+    }
+    private function getFromDatabase(ManagerRegistry $mr): array
+    {
+        $data = $mr->getRepository(Document::class)->findByVersion();
+
+        return [
+            'title' => $data->getTitle(),
+            'sections' => []
+        ];
     }
 
     private function prepareResponseData(array $data): array
