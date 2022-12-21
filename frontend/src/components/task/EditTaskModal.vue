@@ -86,14 +86,10 @@ export default {
         },
     }, 
     mount () {
-        console.log('Visual data XXXX');
-        console.log(this.formUpdData);
         this.formUpd.uuid = this.formUpdData.uuid;
         this.formUpd.title = this.formUpdData.title;
         this.formUpd.description = this.formUpdData.description;
         this.formUpd.priority = this.formUpdData.priority;
-        console.log('Updated data');
-        console.log(this.formUpd);
         this.$forceUpdate();
     }
 }

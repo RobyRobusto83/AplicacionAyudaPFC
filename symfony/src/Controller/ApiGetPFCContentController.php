@@ -38,6 +38,7 @@ class ApiGetPFCContentController extends AbstractController
         );
 
     }
+    
     private function getFromDatabase(ManagerRegistry $mr): array
     {
         $data = $mr->getRepository(Document::class)->findByVersion();

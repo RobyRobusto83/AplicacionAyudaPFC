@@ -4,19 +4,23 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Task;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
 
-class ApiGetScheduleTasksController
+class ApiGetScheduleTasksController extends AbstractController
 {
     #[Route('/api/schedule/tasks', name: 'schedule_get_tasks', methods: ['GET'])]
-    public function __invoke(Request $request): Response
+    public function getTasks(ManagerRegistry $doctrine, Request $request): Response
     {
         try {
-            $data = $this->getData();
+            // $data = $this->getData();
+            $data = $this->getFromDatabase($doctrine);
         } catch (Throwable $e) {
             return new JsonResponse(
                 [
@@ -33,6 +37,28 @@ class ApiGetScheduleTasksController
             ['Content-type' => 'application/' . $request->getContentType()]
         );
 
+    }
+    
+    private function getFromDatabase(ManagerRegistry $mr): array
+    {
+        $tasks = [];
+        $data = $mr->getRepository(Task::class)->findByIdProject(1);
+
+        foreach($data as $task) {
+            $tasks[] = [          
+                'uuid' => $task->getUuid(),
+                'isCompleted' => $task->isDone(),
+                'name' => $task->getName(), 
+                'description' => $task->getDescription(), 
+                'priority' => $task->getPriority(), 
+                '_rowVariant' => $task->getColor()
+            ];
+        }
+
+        return $tasks;
+        return [
+            
+        ];
     }
 
     private function prepareResponseData(array $data): array
