@@ -1,21 +1,11 @@
 <template>
     <div>
-        <div class="row">
-            <div class="col-10">
-                <div class="md-3">
-                    <h5 class="card-title">Listado de tareas</h5>
-                </div>
-                <div class="md-3">
-                  <b-button @click="create($event.target)">Nueva tarea</b-button>
-                </div>
-            </div>
-        </div>
-        <b-container fluid>
+    <b-container fluid>
     <!-- User Interface controls -->
     <b-row>
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Sort"
+          label="Tipo"
           label-for="sort-by-select"
           label-cols-sm="3"
           label-align-sm="right"
@@ -32,7 +22,7 @@
               class="w-75"
             >
               <template #first>
-                <option value="">-- none --</option>
+                <option value=""></option>
               </template>
             </b-form-select>
 
@@ -52,7 +42,7 @@
 
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Initial sort"
+          label="Orden"
           label-for="initial-sort-select"
           label-cols-sm="3"
           label-align-sm="right"
@@ -70,7 +60,7 @@
 
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Filter"
+          label="Filtrar"
           label-for="filter-input"
           label-cols-sm="3"
           label-align-sm="right"
@@ -82,11 +72,11 @@
               id="filter-input"
               v-model="filter"
               type="search"
-              placeholder="Type to Search"
+              placeholder=""
             ></b-form-input>
 
             <b-input-group-append>
-              <b-button :disabled="!filter" @click="filter = ''">Clear</b-button>
+              <b-button :disabled="!filter" @click="filter = ''">Borrar</b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
@@ -95,8 +85,7 @@
       <b-col lg="6" class="my-1">
         <b-form-group
           v-model="sortDirection"
-          label="Filter On"
-          description="Leave all unchecked to filter on all data"
+          label="Filtrar por"
           label-cols-sm="3"
           label-align-sm="right"
           label-size="sm"
@@ -117,7 +106,7 @@
 
       <b-col sm="5" md="6" class="my-1">
         <b-form-group
-          label="Per page"
+          label="Por página"
           label-for="per-page-select"
           label-cols-sm="6"
           label-cols-md="4"
@@ -155,64 +144,6 @@
     </b-row>
 
     <!-- Main table element -->
-    <!-- <b-table
-      :items="items"
-      :fields="fields"
-      :current-page="currentPage"
-      :per-page="perPage"
-      :filter="filter"
-      :filter-included-fields="filterOn"
-      :sort-by.sync="sortBy"
-      :sort-desc.sync="sortDesc"
-      :sort-direction="sortDirection"
-      stacked="md"
-      show-empty
-      small
-      @filtered="onFiltered"
-    >
-      <template v-for="(field, index) in fields" #[`cell(${field.key})`]="data">
-        <b-form-datepicker
-          v-if="field.type === 'date' && items[data.index].isEdit"
-          :key="index"
-          :type="field.type"
-          :value="items[data.index][field.key]"
-          @input="(value) => inputHandler(value, data.index, field.key)"
-        ></b-form-datepicker>
-        <b-form-select
-          v-else-if="field.type === 'select' && items[data.index].isEdit"
-          :key="index"
-          :value="items[data.index][field.key]"
-          @input="(value) => inputHandler(value, data.index, field.key)"
-          :options="field.options"
-        ></b-form-select>
-        <b-checkbox
-          v-else-if="field.key === 'selectRow'"
-          :checked="items[data.index].isSelected"
-          :key="index"
-          @change="selectRowHandler(data)"
-        ></b-checkbox>
-        <div :key="index" v-else-if="field.type === 'edit'">
-          <b-button @click="editRowHandler(data)">
-            <span v-if="!items[data.index].isEdit">Edit</span>
-            <span v-else>Done</span>
-          </b-button>
-          <b-button
-            class="delete-button"
-            variant="danger"
-            @click="removeRowHandler(data.index)"
-            >Remove</b-button
-          >
-        </div>
-        <b-form-input
-          v-else-if="field.type && items[data.index].isEdit"
-          :key="index"
-          :type="field.type"
-          :value="items[data.index][field.key]"
-          @blur="(e) => inputHandler(e.target.value, data.index, field.key)"
-        ></b-form-input>
-        <span :key="index" v-else>{{ data.value }}</span>
-      </template>
-    </b-table> -->
     <b-table
       :items="items"
       :fields="fields"
@@ -229,11 +160,23 @@
       @filtered="onFiltered"
     >
       <template v-slot:cell(name)="row">
-        <b-card-text v-if="!row.item.isEdit">{{ row.item.name }}</b-card-text><b-form-input v-model="row.item.name" v-if="row.item.isEdit"/>
+        <b-card-text v-if="!row.item.isEdit">{{ row.item.name }}</b-card-text>
+        <b-form-input v-model="row.item.name" v-if="row.item.isEdit"/>
       </template>
-      <template v-slot:cell(description)="row" v-if="edit">
-        <b-form-input v-model="row.item.description"/>
+      <template v-slot:cell(description)="row">
+        <b-card-text v-if="!row.item.isEdit">{{ row.item.description }}</b-card-text>
+        <b-form-input v-model="row.item.description" v-if="row.item.isEdit"/>
       </template>
+      <template v-slot:cell(priority)="row">
+        <b-card-text v-if="!row.item.isEdit">{{ row.item.priority }}</b-card-text>
+        <b-form-select v-model="row.item.priority" v-if="row.item.isEdit" :options="options">{{ row.item.priority }}</b-form-select>
+      </template>
+      <template v-slot:cell(isCompleted)="row">
+        <b-card-text v-if="!row.item.isEdit">{{ row.item.isCompleted ? "Sí" : "No"}}</b-card-text>
+        <b-form-checkbox v-model="row.item.isCompleted" v-if="row.item.isEdit" switch></b-form-checkbox>
+      </template>
+
+      
       <template #cell(actions)="row">
         <b-button size="sm"  @click="toggleEdit(row.index)" class="mr-1" variant="outline-primary">
             <b-icon icon="pen-fill" v-if="!row.item.isEdit"/><b-icon icon="file-check" v-if="row.item.isEdit"/>
@@ -319,13 +262,13 @@
             filterByFormatted: true,
             type: "selectRow"
           },
-          { key: 'actions', label: 'Actions', type: "edit" }
+          { key: 'actions', label: 'Acciones', type: "edit" }
         ],
         edit: false,
         // totalRows: 1,
         currentPage: 1,
         perPage: 5,
-        pageOptions: [5, 10, 15, { value: 100, text: "Show a lot" }],
+        pageOptions: [5, 10, 15, { value: 100, text: "Mostrar todas" }],
         sortBy: '',
         sortDesc: false,
         sortDirection: 'asc',
@@ -363,7 +306,8 @@
           index: null,
           title: '',
           content: ''
-        }
+        },
+        options:['Alta', 'Media', 'Baja',],
       }
     },
     computed: {
@@ -402,11 +346,8 @@
         this.currentPage = 1
       },
       toggleEdit(index){
-        console.log(index);
-        console.log(this.items[index].isEdit);
         this.items[index].isEdit = !this.items[index].isEdit;
-        console.log(this.items[index].isEdit);
-        this.$emit('input', this.items[index]);
+        this.$forceUpdate();
       },
       infoDeleteModal(item, index, button) {
         this.deleteModal.index = index;
@@ -443,7 +384,7 @@
       createRow(newTask) {
         var newTaskRow = {
           uuid: newTask.uuid, 
-          isCompleted: false, 
+          isCompleted: ['false'], 
           name: newTask.title, 
           description: newTask.description, 
           priority: newTask.priority, 
