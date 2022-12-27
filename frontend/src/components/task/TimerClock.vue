@@ -4,19 +4,15 @@
       <p class="timer">{{zfill(hour)}}:{{zfill(min)}}:{{zfill(sec)}}</p>
   
       <div class="btns">
-        <button class="btn btn-primary" @click="play">{{timer !== null ? "Pausa" :"Empezar" }}</button>
-        <button class="btn btn-primary" @click="clear">Reiniciar</button>
+        <button class="btn btn-outline-light" @click="play">{{timer !== null ? "Pausa" :"Empezar" }}</button>
+        <button class="btn btn-outline-light" @click="clear">Reiniciar</button>        
+        <!-- <button class="btn btn-outline-light" @click="clearIntervalList">Borrar</button> -->
       </div>
   
-      <div class="interval" v-show="intervalList.length > 0">
-        <ul>
-          <div class="alert alert-info" role="alert">
-          <li v-for="interval in intervalList" :key="interval" >Pausa en {{interval}}</li>
-        </div>
-        </ul>
-        <button class="btn btn-primary" @click="clearIntervalList">Borrar</button>
-      </div>
-  
+      <!-- <div class="interval" v-show="intervalList.length > 0">
+        
+        <button class="btn btn-outline-light" @click="clearIntervalList">Borrar</button>
+      </div>   -->
     </div>
   </template>
   
@@ -81,12 +77,12 @@
   }
   </script>
   
-  <style>
-  
+  <style>  
   .timer{
     color: rgb(7, 7, 7);
-    font-size: 100px;
+    font-size: 26px;
     text-align: center;
+    color: white;
   }
   .interval ul li{
     list-style: none;
