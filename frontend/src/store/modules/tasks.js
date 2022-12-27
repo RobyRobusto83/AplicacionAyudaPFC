@@ -14,10 +14,10 @@ const mutations = {
   ADD_TASK: (state, payload) => {
     state.tasks.unshift(payload)
   },
-  DELETE_TASK: (state, id) => {
-      state.tasks.filter(task => task.uuid !== id),
-      state.tasks.splice(task => task.id, 1)
-  }
+  // DELETE_TASK: (state, id) => {
+  //     state.tasks.filter(task => task.uuid !== id),
+  //     state.tasks.splice(task => task.id, 1)
+  // }
 }
 
 // getters
@@ -47,6 +47,9 @@ const actions = {
       console.log(error);
     }
   },
+  updateTaskList(context, taskList){
+    context.commit('SET_TASKS', taskList)
+  }
 }
 
 export default {

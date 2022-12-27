@@ -1,11 +1,21 @@
 <template>
     <div>
-    <b-container fluid>
+        <div class="row">
+            <div class="col-10">
+                <div class="md-3">
+                    <h5 class="card-title">Listado de tareas</h5>
+                </div>
+                <div class="md-3">
+                  <b-button @click="create($event.target)">Nueva tarea</b-button>
+                </div>
+            </div>
+        </div>
+        <b-container fluid>
     <!-- User Interface controls -->
     <b-row>
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Tipo"
+          label="Sort"
           label-for="sort-by-select"
           label-cols-sm="3"
           label-align-sm="right"
@@ -22,7 +32,7 @@
               class="w-75"
             >
               <template #first>
-                <option value=""></option>
+                <option value="">-- none --</option>
               </template>
             </b-form-select>
 
@@ -42,7 +52,7 @@
 
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Orden"
+          label="Initial sort"
           label-for="initial-sort-select"
           label-cols-sm="3"
           label-align-sm="right"
@@ -60,7 +70,7 @@
 
       <b-col lg="6" class="my-1">
         <b-form-group
-          label="Filtrar"
+          label="Filter"
           label-for="filter-input"
           label-cols-sm="3"
           label-align-sm="right"
@@ -72,11 +82,11 @@
               id="filter-input"
               v-model="filter"
               type="search"
-              placeholder=""
+              placeholder="Type to Search"
             ></b-form-input>
 
             <b-input-group-append>
-              <b-button :disabled="!filter" @click="filter = ''">Borrar</b-button>
+              <b-button :disabled="!filter" @click="filter = ''">Clear</b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
@@ -85,7 +95,8 @@
       <b-col lg="6" class="my-1">
         <b-form-group
           v-model="sortDirection"
-          label="Filtrar por"
+          label="Filter On"
+          description="Leave all unchecked to filter on all data"
           label-cols-sm="3"
           label-align-sm="right"
           label-size="sm"
@@ -106,7 +117,7 @@
 
       <b-col sm="5" md="6" class="my-1">
         <b-form-group
-          label="Por página"
+          label="Per page"
           label-for="per-page-select"
           label-cols-sm="6"
           label-cols-md="4"
@@ -169,14 +180,12 @@
       </template>
       <template v-slot:cell(priority)="row">
         <b-card-text v-if="!row.item.isEdit">{{ row.item.priority }}</b-card-text>
-        <b-form-select v-model="row.item.priority" v-if="row.item.isEdit" :options="options">{{ row.item.priority }}</b-form-select>
+        <b-form-select v-model="row.item.priority" :options="options" v-if="row.item.isEdit"></b-form-select>
       </template>
       <template v-slot:cell(isCompleted)="row">
-        <b-card-text v-if="!row.item.isEdit">{{ row.item.isCompleted ? "Sí" : "No"}}</b-card-text>
+        <b-card-text v-if="!row.item.isEdit">{{ row.item.isCompleted ? "Sí": "No" }}</b-card-text>
         <b-form-checkbox v-model="row.item.isCompleted" v-if="row.item.isEdit" switch></b-form-checkbox>
       </template>
-
-      
       <template #cell(actions)="row">
         <b-button size="sm"  @click="toggleEdit(row.index)" class="mr-1" variant="outline-primary">
             <b-icon icon="pen-fill" v-if="!row.item.isEdit"/><b-icon icon="file-check" v-if="row.item.isEdit"/>
@@ -210,7 +219,7 @@
     <CreateTaskModal :id="createModal.id" :title="createModal.title" v-bind:formData="newTask" @createdTask="createRow" @resetedNewTask="resetCreateModal"/>
     
     <!-- Edit modal -->
-    <EditTaskModal :id="editModal.id" :title="editModal.title" v-bind:formUpdData="updateTask" />
+    <!-- <EditTaskModal :id="editModal.id" :title="editModal.title" v-bind:formUpdData="updateTask" /> -->
     <!-- @updatedTask="updateRow" @resetedUpdateTask="resetUpdateModal" -->
    <!--   -->
     
@@ -226,20 +235,18 @@
 // https://muhimasri.com/blogs/part-4-load-add-update-and-delete-table-rows-using-api-services/
   import { v4 as uuidv4 } from 'uuid';
   import CreateTaskModal from "@/components/task/CreateTaskModal.vue"
-  import EditTaskModal from "@/components/task/EditTaskModal.vue"
+  // import EditTaskModal from "@/components/task/EditTaskModal.vue"
   import TimerClock from "@/components/task/TimerClock.vue"
 
   export default {
     name: 'TaskList',
     components: {
       CreateTaskModal,
-      EditTaskModal,
+      // EditTaskModal,
       TimerClock
     },
     created() {
       this.$store.dispatch('tasks/fetchTasks');
-      // this.totalRows = this.items.length;
-      // this.$emit('input', this.totalRows);
     },
     mounted() {
       // Set the initial number of items
@@ -251,24 +258,14 @@
           { key: 'name', label: 'Nombre', sortable: true, sortDirection: 'desc', type: "text" },
           { key: 'description', label: 'Descripción', sortable: true, sortDirection: 'desc', type: "text" },
           { key: 'priority', label: 'Prioridad', sortable: true, class: 'text-center', type: "select" },
-          {
-            key: 'isCompleted',
-            label: 'Completada',
-            formatter: (value) => {
-              return value ? 'Yes' : 'No'
-            },
-            sortable: true,
-            sortByFormatted: true,
-            filterByFormatted: true,
-            type: "selectRow"
-          },
-          { key: 'actions', label: 'Acciones', type: "edit" }
+          { key: 'isCompleted', label: 'Completada', sortable: true, sortByFormatted: true, filterByFormatted: true, type: "selectRow" },
+          { key: 'actions', label: 'Actions', type: "edit" }
         ],
         edit: false,
         // totalRows: 1,
         currentPage: 1,
         perPage: 5,
-        pageOptions: [5, 10, 15, { value: 100, text: "Mostrar todas" }],
+        pageOptions: [5, 10, 15, { value: 100, text: "Todas (100 máx)" }],
         sortBy: '',
         sortDesc: false,
         sortDirection: 'asc',
@@ -291,10 +288,10 @@
           description: '',
           priority: 'Baja'
         },
-        editModal: {
-          id: 'edit-modal',
-          content: null
-        },
+        // editModal: {
+        //   id: 'edit-modal',
+        //   content: null
+        // },
         updateTask: {
           id: uuidv4(),
           title: '',
@@ -307,7 +304,7 @@
           title: '',
           content: ''
         },
-        options:['Alta', 'Media', 'Baja',],
+        options: [ 'Alta', 'Media', 'Baja',]
       }
     },
     computed: {
@@ -319,27 +316,45 @@
             return { text: f.label, value: f.key }
           })
       },
-      items() {
-        var data = this.$store.state.tasks.tasks;
-        data.forEach(function (row) {
-          row.isEdit = false;
-          row.isSelected = false;
-        });
-        return data;
+      items: {
+        get() {
+          var data = this.$store.state.tasks.tasks;
+          data.forEach(function (row) {
+            row.isEdit = false;
+            row.isSelected = false;
+          });
+          
+          return data;
+        },
+        set(taskList) {
+          console.log(taskList);
+          this.$store.dispatch('tasks/updateTaskList', taskList)
+          return taskList;
+        }
       },
-      totalRows(){
-        return this.items.length
+      totalRows: {
+        get() {
+          return this.items.length;
+        },
+        set(value) {
+          return value;
+        } 
       }
     },
+    // watch: {
+    //   items(value) {
+    //       //this.$store.dispatch('setTestAccounts', value);
+    //     console.log('Watching...');
+    //       console.log(value);
+    //   }
+    // },
     methods: {
-    editRowHandler(data) {
-      this.items[data.index].isEdit = !this.items[data.index].isEdit;
-      console.log(this.items[data.index]);
-    },
-    selectRowHandler(data) {
-      this.items[data.index].isSelected =
-        !this.items[data.index].isSelected;
-    },
+      editRowHandler(data) {
+        this.items[data.index].isEdit = !this.items[data.index].isEdit;
+      },
+      selectRowHandler(data) {
+        this.items[data.index].isSelected = !this.items[data.index].isSelected;
+      },
       onFiltered(filteredItems) {
         // Trigger pagination to update the number of buttons/pages due to filtering
         this.totalRows = filteredItems.length
@@ -364,8 +379,8 @@
         console.log(index);
         const currentRow = this.items.filter((item, i) => i == index);
         console.log(currentRow[0]);
-        // this.items = this.items.filter((item, i) => i !== index);
-        // this.totalRows = this.items.length
+        this.items = this.items.filter((item, i) => i !== index);
+        this.totalRows = this.items.length
         // this.$emit('input', this.totalRows);
       },
       create(button) {
@@ -384,7 +399,7 @@
       createRow(newTask) {
         var newTaskRow = {
           uuid: newTask.uuid, 
-          isCompleted: ['false'], 
+          isCompleted: false, 
           name: newTask.title, 
           description: newTask.description, 
           priority: newTask.priority, 
@@ -395,35 +410,34 @@
         this.totalRows = this.items.length
         this.$emit('input', this.totalRows);
       },
-      infoEditModal(item, index, button) {
-        this.editModal.index = 0;
-        this.editModal.title = `Modificar Tarea`
-        this.editModal.content = 'item.description'
-        this.updateTask = {
-          uuid: uuidv4(),
-          title: 'Updatet',
-          description: 'Changing',
-          priority: 'Alta'
-        }
-        this.$root.$emit('input', this.updateTask);
-        this.$root.$emit('bv::show::modal', this.editModal.id, button)
-      },
-      editRow(event) {
-        console.log('Editing task');
-        console.log(event);
-        console.log(this.form);
-        event.preventDefault()
-        alert(JSON.stringify(this.newTask))
-        // this.items = this.items.filter((item, i) => i !== index);
-        // this.totalRows = this.items.length
-        // this.$emit('input', this.totalRows);
-      },
-      resetEditModal() {
-        console.log('Reseting edit modal');
-        this.editModalModal.index = null
-        this.editModalModal.title = ''
-        this.editModalModal.content = ''
-      },
+      // infoEditModal(item, index, button) {
+      //   this.editModal.index = 0;
+      //   this.editModal.title = `Modificar Tarea`
+      //   this.editModal.content = 'item.description'
+      //   this.updateTask = {
+      //     uuid: uuidv4(),
+      //     title: 'Updatet',
+      //     description: 'Changing',
+      //     priority: 'Alta'
+      //   }
+      //   this.$root.$emit('input', this.updateTask);
+      //   this.$root.$emit('bv::show::modal', this.editModal.id, button)
+      // },
+      // editRow(item) {
+      //   // https://stackoverflow.com/questions/54047146/vue-js-2-watch-error-in-callback-for-watcher-youraccountsstate-referenceer
+      //   console.log('Editing task');
+      //   console.log(item);
+      //   // alert(JSON.stringify(item));
+      //   // this.items = this.items.filter((item, i) => i !== index);
+      //   // this.totalRows = this.items.length
+      //   // this.$emit('input', this.totalRows);
+      // },
+      // resetEditModal() {
+      //   console.log('Reseting edit modal');
+      //   this.editModalModal.index = null
+      //   this.editModalModal.title = ''
+      //   this.editModalModal.content = ''
+      // },
       timer(item, index, button) {
         this.timerModal.index = index;
         this.timerModal.title = ``
