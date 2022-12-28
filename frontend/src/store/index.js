@@ -8,6 +8,7 @@ import Vuex from 'vuex'
 
 import tasks from '@/store/modules/tasks'
 import pfc from '@/store/modules/pfc'
+import timer from '@/store/modules/timer'
 
 Vue.use(Vuex)
 
@@ -22,7 +23,8 @@ export default new Vuex.Store({
     },
     modules: {
         tasks,
-        pfc
+        pfc,
+        timer
     },
     strict: debug
 })

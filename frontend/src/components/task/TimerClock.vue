@@ -1,11 +1,12 @@
 <template>
-    <div id="app">
-      <!-- <img class="img" src="@/assets/cronometro.png" /> -->
-      <p class="timer">{{zfill(hour)}}:{{zfill(min)}}:{{zfill(sec)}}</p>
-  
-      <div class="btns">
-        <button class="btn btn-outline-light" @click="play">{{timer !== null ? "Pausa" :"Empezar" }}</button>
-        <button class="btn btn-outline-light" @click="clear">Reiniciar</button>        
+      <!-- <img class="img" src="@/assets/cronometro.png" /> --> 
+      <div class="btns" v-if="isActive">
+        <span class="timer">{{ taskName }}</span>
+        <span class="timer">{{zfill(hour)}}:{{zfill(min)}}:{{zfill(sec)}}</span>
+        <button class="btn btn-outline-light" @click="play">
+          <b-icon icon="pause" v-if="timer !== null"/><b-icon icon="play" v-if="timer === null"/>
+        </button>
+        <button class="btn btn-outline-light" @click="clear">Finalizar</button>        
         <!-- <button class="btn btn-outline-light" @click="clearIntervalList">Borrar</button> -->
       </div>
   
@@ -13,7 +14,6 @@
         
         <button class="btn btn-outline-light" @click="clearIntervalList">Borrar</button>
       </div>   -->
-    </div>
   </template>
   
   <script>
@@ -26,6 +26,30 @@
         hour: 0,
         timer: null,
         intervalList: []
+      }
+    },
+    computed: {
+      isActive: {
+        get() {
+          return this.$store.state.timer.isActive;
+        },
+        set(value) {
+          console.log(value);
+          this.$store.dispatch('timer/change')
+        }
+      },
+      taskName:{
+        get(){
+          return this.$store.state.timer.taskName;
+        }
+      }
+    },
+    watch: {
+      isActive: function(newValue) {
+        console.log(newValue);
+        if(newValue){
+          this.play();
+        }
       }
     },
     methods: {
@@ -60,14 +84,15 @@
         console.log(this.intervalList)
       },
       clear(){
-        if(this.timer !== null){
-          clearInterval(this.timer)
-          this.timer = null
-        }
-        this.sec = 0;
-        this.min = 0;
-        this.hour = 0;
-        this.clearIntervalList();
+        // if(this.timer !== null){
+        //   clearInterval(this.timer)
+        //   this.timer = null
+        // }
+        // this.sec = 0;
+        // this.min = 0;
+        // this.hour = 0;
+        // this.clearIntervalList();
+        this.isActive = !this.isActive
       },
       clearIntervalList(){
         this.intervalList = []

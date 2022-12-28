@@ -193,8 +193,8 @@
         <b-button size="sm" @click="infoDeleteModal(row.item, row.index, $event.target)" class="mr-1" variant="outline-danger">
             <b-icon icon="trash"/>
         </b-button>
-        <b-button size="sm" @click="timer(row.item, row.index, $event.target)" class="mr-1" variant="outline-success">
-            <b-icon icon="clock"/>
+        <b-button size="sm" @click="llamadadeTiempo(row.item)" class="mr-1" variant="outline-success">
+            <b-icon icon="clock" v-if="timer !== null"/>
         </b-button>
         <b-button size="sm" @click="row.toggleDetails" variant="outline-secondary">
           <b-icon v-if="row.detailsShowing" icon="eye-slash"/><b-icon v-else icon="eye"/>
@@ -223,9 +223,9 @@
     <!-- @updatedTask="updateRow" @resetedUpdateTask="resetUpdateModal" -->
    <!--   -->
     
-    <b-modal :id="timerModal.id" :title="timerModal.title" @hide="resetTimerModal" @ok="addTimer(timerModal.index)">
+    <!-- <b-modal :id="timerModal.id" :title="timerModal.title" @hide="resetTimerModal" @ok="addTimer(timerModal.index)">
         <TimerClock />
-    </b-modal>  
+    </b-modal>   -->
   </b-container>
     </div>
 </template>
@@ -236,14 +236,14 @@
   import { v4 as uuidv4 } from 'uuid';
   import CreateTaskModal from "@/components/task/CreateTaskModal.vue"
   // import EditTaskModal from "@/components/task/EditTaskModal.vue"
-  import TimerClock from "@/components/task/TimerClock.vue"
+  // import TimerClock from "@/components/task/TimerClock.vue"
 
   export default {
     name: 'TaskList',
     components: {
       CreateTaskModal,
       // EditTaskModal,
-      TimerClock
+      // TimerClock
     },
     created() {
       this.$store.dispatch('tasks/fetchTasks');
@@ -349,6 +349,16 @@
     //   }
     // },
     methods: {
+      llamadadeTiempo(row){
+        if (!this.$store.state.timer.isActive){
+          var task = {
+            id: row.uuid, 
+            name: row.name 
+          }
+          this.$store.dispatch('timer/setTask', task)
+          this.$store.dispatch('timer/change')
+        }
+      },
       editRowHandler(data) {
         this.items[data.index].isEdit = !this.items[data.index].isEdit;
       },
@@ -442,7 +452,8 @@
         this.timerModal.index = index;
         this.timerModal.title = ``
         this.timerModal.content = item.description
-        this.$root.$emit('bv::show::modal', this.timerModal.id, button)
+        this.$root.$emit(this.timerModal.id, button)
+        // this.$root.$emit('bv::show::modal', this.timerModal.id, button)
       },
       resetTimerModal() {
         this.timerModal.index = null
