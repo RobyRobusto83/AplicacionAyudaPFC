@@ -151,9 +151,9 @@ class Task
         return $this->color;
     }
 
-    public function setColor(string $done): self
+    public function setColor(string $color): self
     {
-        $this->done = $done;
+        $this->color = $color;
 
         return $this;
     }

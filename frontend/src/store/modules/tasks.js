@@ -34,8 +34,21 @@ const actions = {
   //     commit('SET_TASKS', tasks)
   //   })
   // },
-  addNewTask (context, newTask) {
-      context.commit('ADD_TASK', newTask);
+  async addNewTask (context, newTask) {      
+      try {
+        await axios.post(
+          "http://localhost:9980/api/schedule/newTask",
+          {
+            "id": newTask.uuid,
+            "name": newTask.name,
+            "description": newTask.description,
+            "priority": newTask.priority
+        }
+        );
+        context.commit('ADD_TASK', newTask);
+      } catch (error) {
+        console.log(error);
+      }
   },
   async fetchTasks ({ commit }) {
     try {
