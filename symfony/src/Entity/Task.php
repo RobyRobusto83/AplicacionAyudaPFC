@@ -40,6 +40,9 @@ class Task
     #[ORM\Column(type: "boolean", options: ["default"=>"0"])]
     private $done;
 
+    #[ORM\Column(type: "boolean", options: ["default"=>"0"])]
+    private $isDeleted;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -129,11 +132,6 @@ class Task
         return $this;
     }
 
-    public function isDone(): bool
-    {
-        return $this->done === 1;
-    }
-
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
@@ -154,6 +152,18 @@ class Task
     public function setColor(string $color): self
     {
         $this->color = $color;
+
+        return $this;
+    }
+
+    public function getIsDeleted(): ?int
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted(int $isDeleted): self
+    {
+        $this->isDeleted = $isDeleted;
 
         return $this;
     }

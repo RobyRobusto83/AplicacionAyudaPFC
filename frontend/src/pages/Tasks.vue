@@ -188,7 +188,7 @@
       </template>
       <template #cell(actions)="row">
         <b-button size="sm"  @click="toggleEdit(row.index)" class="mr-1" variant="outline-primary">
-            <b-icon icon="pen-fill" v-if="!row.item.isEdit"/><b-icon icon="file-check" v-if="row.item.isEdit"/>
+            <b-icon icon="pen-fill" v-if="!row.item.isEdit"/><b-icon icon="file-check" v-if="row.item.isEdit" @click="updateTask(row.index, row.item)"/>
         </b-button>
         <b-button size="sm" @click="infoDeleteModal(row.item, row.index, $event.target)" class="mr-1" variant="outline-danger">
             <b-icon icon="trash"/>
@@ -288,16 +288,6 @@
           description: '',
           priority: 'Baja'
         },
-        // editModal: {
-        //   id: 'edit-modal',
-        //   content: null
-        // },
-        updateTask: {
-          id: uuidv4(),
-          title: '',
-          description: '',
-          priority: ''
-        },
         timerModal: {
           id: 'timer-modal',
           index: null,
@@ -318,16 +308,23 @@
       },
       items: {
         get() {
-          var data = this.$store.state.tasks.tasks;
-          data.forEach(function (row) {
-            row.isEdit = false;
-            row.isSelected = false;
+          var newData = [];
+          this.$store.getters['tasks/tasksList'].forEach(function (row) {
+            var newRow = {};
+            newRow.description = row.description
+            newRow.isCompleted = row.isCompleted
+            newRow.name = row.name
+            newRow.priority = row.priority
+            newRow.uuid = row.uuid
+            newRow._rowVariant = row._rowVariant
+            newRow.isEdit = false;
+            newRow.isSelected = false;
+            newData.push(newRow);
           });
-          
-          return data;
+
+          return newData;
         },
         set(taskList) {
-          console.log(taskList);
           this.$store.dispatch('tasks/updateTaskList', taskList)
           return taskList;
         }
@@ -388,10 +385,11 @@
       removeRow(index) {
         console.log(index);
         const currentRow = this.items.filter((item, i) => i == index);
+        this.$store.dispatch('tasks/deleteTask', currentRow[0].uuid);
         console.log(currentRow[0]);
-        this.items = this.items.filter((item, i) => i !== index);
-        this.totalRows = this.items.length
-        // this.$emit('input', this.totalRows);
+
+        var tasks = this.items.filter((item, i) => i !== index);
+        this.$store.dispatch('tasks/updateTaskList', tasks);
       },
       create(button) {
         this.createModal.index = 0;
@@ -420,34 +418,6 @@
         this.totalRows = this.items.length
         this.$emit('input', this.totalRows);
       },
-      // infoEditModal(item, index, button) {
-      //   this.editModal.index = 0;
-      //   this.editModal.title = `Modificar Tarea`
-      //   this.editModal.content = 'item.description'
-      //   this.updateTask = {
-      //     uuid: uuidv4(),
-      //     title: 'Updatet',
-      //     description: 'Changing',
-      //     priority: 'Alta'
-      //   }
-      //   this.$root.$emit('input', this.updateTask);
-      //   this.$root.$emit('bv::show::modal', this.editModal.id, button)
-      // },
-      // editRow(item) {
-      //   // https://stackoverflow.com/questions/54047146/vue-js-2-watch-error-in-callback-for-watcher-youraccountsstate-referenceer
-      //   console.log('Editing task');
-      //   console.log(item);
-      //   // alert(JSON.stringify(item));
-      //   // this.items = this.items.filter((item, i) => i !== index);
-      //   // this.totalRows = this.items.length
-      //   // this.$emit('input', this.totalRows);
-      // },
-      // resetEditModal() {
-      //   console.log('Reseting edit modal');
-      //   this.editModalModal.index = null
-      //   this.editModalModal.title = ''
-      //   this.editModalModal.content = ''
-      // },
       timer(item, index, button) {
         this.timerModal.index = index;
         this.timerModal.title = ``
@@ -465,6 +435,10 @@
         // this.items = this.items.filter((item, i) => i !== index);
         // this.totalRows = this.items.length
         // this.$emit('input', this.totalRows);
+      },
+      updateTask(index, item) {
+        this.$store.dispatch('tasks/updateTask', item);
+        this.toggleEdit(index);
       }
     }
   }

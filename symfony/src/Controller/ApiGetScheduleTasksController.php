@@ -41,13 +41,13 @@ class ApiGetScheduleTasksController extends AbstractController
     
     private function getFromDatabase(ManagerRegistry $mr): array
     {
-        $tasks = [];
+        $tasks = [];        
         $data = $mr->getRepository(Task::class)->findByIdProject(1);
 
         foreach($data as $task) {
             $tasks[] = [          
                 'uuid' => $task->getUuid(),
-                'isCompleted' => $task->isDone(),
+                'isCompleted' => (bool)$task->getDone(),
                 'name' => $task->getName(), 
                 'description' => $task->getDescription(), 
                 'priority' => $task->getPriority(), 

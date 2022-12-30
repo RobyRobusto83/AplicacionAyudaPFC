@@ -14,10 +14,22 @@ const mutations = {
   ADD_TASK: (state, payload) => {
     state.tasks.unshift(payload)
   },
-  // DELETE_TASK: (state, id) => {
-  //     state.tasks.filter(task => task.uuid !== id),
-  //     state.tasks.splice(task => task.id, 1)
-  // }
+  UPDATE_TASKS: (state, payload) => {
+    state.tasks = payload
+  },
+  UPDATE_TASK:(state, payload) => {
+    state.tasks.forEach(
+      function (task) {
+        if (task.uuid === payload.uuid) {
+          task.name = payload.name,
+          task.description = payload.description,
+          task.priority = payload.priority,
+          task.isCompleted = payload.isCompleted,
+          task._rowVariant = payload._rowVariant
+        }
+      }
+    );
+  }
 }
 
 // getters
@@ -29,10 +41,8 @@ const getters = {
 
 // actions
 const actions = {
-  // fetchTasks ({ commit }) {
-  //   schedule.getTasks(tasks => {
-  //     commit('SET_TASKS', tasks)
-  //   })
+  // getTasks ({ commit }) {
+  //   return commit("GET_TASKS")
   // },
   async addNewTask (context, newTask) {      
       try {
@@ -43,13 +53,14 @@ const actions = {
             "name": newTask.name,
             "description": newTask.description,
             "priority": newTask.priority
-        }
+          }
         );
         context.commit('ADD_TASK', newTask);
       } catch (error) {
         console.log(error);
       }
   },
+  
   async fetchTasks ({ commit }) {
     try {
       const data = await axios.get(
@@ -62,6 +73,37 @@ const actions = {
   },
   updateTaskList(context, taskList){
     context.commit('SET_TASKS', taskList)
+  },
+ 
+ async updateTask (context, updateTask) {      
+    try {
+      var payload = {
+        "id": updateTask.uuid,
+        "name": updateTask.name,
+        "description": updateTask.description,
+        "priority": updateTask.priority,
+        "total_time": 0,
+        "done": updateTask.isCompleted,
+        "color": updateTask._rowVariant
+      };
+      axios.post(
+        "http://localhost:9980/api/schedule/updateTask",
+        payload
+      );
+      context.commit('UPDATE_TASK', updateTask);
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  async deleteTask (context, taskId) {      
+    try {
+      axios.delete(
+        "http://localhost:9980/api/schedule/deleteTask/" + taskId
+      );
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 
