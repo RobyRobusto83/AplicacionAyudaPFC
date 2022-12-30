@@ -51,7 +51,8 @@ class ApiGetScheduleTasksController extends AbstractController
                 'name' => $task->getName(), 
                 'description' => $task->getDescription(), 
                 'priority' => $task->getPriority(), 
-                '_rowVariant' => $task->getColor()
+                '_rowVariant' => $task->getColor(),
+                'total_time' => $task->getTimeTotal(),
             ];
         }
 

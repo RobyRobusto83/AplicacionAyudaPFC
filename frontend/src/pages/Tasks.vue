@@ -319,6 +319,8 @@
             newRow._rowVariant = row._rowVariant
             newRow.isEdit = false;
             newRow.isSelected = false;
+            newRow.totalTime = row.total_time;
+
             newData.push(newRow);
           });
 
