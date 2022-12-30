@@ -210,7 +210,7 @@
           
           <b-card-body>
             <b-card-title>{{row.item.name}}</b-card-title>
-            <b-card-text>{{ row.item.description }}</b-card-text>
+            <b-card-text><span style="white-space: pre-line">{{ row.item.description }}</span></b-card-text>
           </b-card-body>
 
           <b-list-group flush>

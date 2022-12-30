@@ -49,9 +49,14 @@
         // ["clean"]
         ]
     }),
+    mounted() {
+        this.targetContent = this.content
+    },
     computed: {
-        targetContent() {
-            return this.content
+        targetContent: {
+            set(content) {
+               return content;
+            }
         }
     },
   };

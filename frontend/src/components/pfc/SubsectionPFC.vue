@@ -11,7 +11,7 @@
       <b-button size="sm" @click="editChanged()" class="mr-1" variant="outline-secondary" v-if="isEditable"><b-icon-x-square/></b-button>
     </div>
 
-    <FreeTextPFC :id="id" :content="content" />
+    <FreeTextPFC :section="section" :id="id" :content="content" />
 
   </div>    
 </template>

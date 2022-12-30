@@ -99,6 +99,21 @@ const mutations = {
         }
       }
     );
+  },
+  UPDATE_SUBSECTION_CONTENT: (state, payload) => {
+    state.document.sections.forEach(
+      function (section) {
+        if (section.id === payload.section) {
+          section.subsections.forEach(
+            function (subsection) {
+              if (subsection.id === payload.subsection) {
+                subsection.content = payload.content;
+              }
+            }
+          );
+        }
+      }
+    );
   }
 }
 
@@ -150,6 +165,9 @@ const actions = {
   },
   addNewSubsection (context, payload) {
     context.commit('ADD_NEW_SUBSECTION', payload);
+  },
+  updateSubsectionContent(context, payload) {
+    context.commit('UPDATE_SUBSECTION_CONTENT', payload);
   }
 }
 
