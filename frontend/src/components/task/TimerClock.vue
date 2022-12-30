@@ -6,17 +6,13 @@
         <button class="btn btn-outline-light" @click="play">
           <b-icon icon="pause" v-if="timer !== null"/><b-icon icon="play" v-if="timer === null"/>
         </button>
-        <button class="btn btn-outline-light" @click="clear">Finalizar</button>        
-        <!-- <button class="btn btn-outline-light" @click="clearIntervalList">Borrar</button> -->
+        <button class="btn btn-outline-light" @click="assignTime">Finalizar</button>        
       </div>
-  
-      <!-- <div class="interval" v-show="intervalList.length > 0">
-        
-        <button class="btn btn-outline-light" @click="clearIntervalList">Borrar</button>
-      </div>   -->
   </template>
   
   <script>
+  import axios from "axios";
+
   export default {
     name: 'TimerClock',
     data(){
@@ -24,8 +20,7 @@
         sec: 0,
         min: 0,
         hour: 0,
-        timer: null,
-        intervalList: []
+        timer: null
       }
     },
     computed: {
@@ -33,8 +28,7 @@
         get() {
           return this.$store.state.timer.isActive;
         },
-        set(value) {
-          console.log(value);
+        set() {
           this.$store.dispatch('timer/change')
         }
       },
@@ -42,11 +36,15 @@
         get(){
           return this.$store.state.timer.taskName;
         }
+      },
+      taskId:{
+        get(){
+          return this.$store.state.timer.taskId;
+        }
       }
     },
     watch: {
       isActive: function(newValue) {
-        console.log(newValue);
         if(newValue){
           this.play();
         }
@@ -56,17 +54,18 @@
       zfill(number){
         return number.toString().padStart(2,0)
       },
-      play(){
-        
-        if(this.timer === null){
+      play() {        
+        if (this.timer === null){
           this.playing()
           this.timer = setInterval(()=> this.playing(), 1000)
+        } else {
+          this.stopTimer();
         }
-        else{
-          clearInterval(this.timer);
-          this.timer = null;
-          this.pause();
-        }
+      },
+      stopTimer(){
+        // Pausa en el reloj
+        clearInterval(this.timer);
+        this.timer = null;
       },
       playing(){
         this.sec++
@@ -79,24 +78,30 @@
           this.hour++;
         }
       },
-      pause(){
-        this.intervalList.push(`${this.zfill(this.hour)}:${this.zfill(this.min)}:${this.zfill(this.sec)}`)
-        console.log(this.intervalList)
+      clearTimer(){
+        this.timer = null;          
+        this.sec = 0;
+        this.min = 0;
+        this.hour = 0;
       },
-      clear(){
-        // if(this.timer !== null){
-        //   clearInterval(this.timer)
-        //   this.timer = null
-        // }
-        // this.sec = 0;
-        // this.min = 0;
-        // this.hour = 0;
-        // this.clearIntervalList();
+      assignTime(){
+        this.stopTimer();
+          
+        try {
+          var payload = {
+            "id": this.taskId,
+            "time": this.sec + this.min * 60 + this.hour * 3600
+          };
+          axios.post(
+            "http://localhost:9980/api/schedule/assignTimeToTask",
+            payload
+          );
+        } catch (error) {
+          console.log(error);
+        }
+
+        this.clearTimer();
         this.isActive = !this.isActive
-      },
-      clearIntervalList(){
-        this.intervalList = []
-        console.log(this.intervalList)
       }
     }
   }

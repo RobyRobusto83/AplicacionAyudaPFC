@@ -107,6 +107,13 @@ class Task
 
         return $this;
     }
+    
+    public function assignTime(int $timeSec): self
+    {
+        $this->timeTotal += $timeSec;
+
+        return $this;
+    }
 
     public function getIdProject(): ?int
     {
