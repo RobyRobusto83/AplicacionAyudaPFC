@@ -31,7 +31,9 @@ class ApiPostScheduleAssignTimeToTaskController extends AbstractController
             }
 
             // Modifico la tarea
-            $task->assignTime($param['time']);
+            if (!$task->getDone()){
+                $task->assignTime($param['time']);
+            }
             
             $doctrine->getManager()->flush();            
         } catch (Throwable $e) {
