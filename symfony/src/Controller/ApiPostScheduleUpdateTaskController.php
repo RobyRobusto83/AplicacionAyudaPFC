@@ -56,10 +56,4 @@ class ApiPostScheduleUpdateTaskController extends AbstractController
             ['Content-type' => 'application/' . $request->getContentType()]
         );
     }
-    // public function update(ManagerRegistry $doctrine, int $uuid): Response
-    // {
-    //     $entityManager = $doctrine->getManager();
-    //     $product = $entityManager->getRepository(Product::class)->find($uuid);
-
-        
 }

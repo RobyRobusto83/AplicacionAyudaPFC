@@ -3,10 +3,7 @@
         <div class="row">
             <div class="col-10">
                 <div class="md-3">
-                    <h5 class="card-title">Listado de tareas</h5>
-                </div>
-                <div class="md-3">
-                  <b-button @click="create($event.target)">Nueva tarea</b-button>
+                    <h5 class="card-title">Mis tareas</h5>
                 </div>
             </div>
         </div>
@@ -175,8 +172,15 @@
         <b-form-input v-model="row.item.name" v-if="row.item.isEdit"/>
       </template>
       <template v-slot:cell(description)="row">
-        <b-card-text v-if="!row.item.isEdit">{{ row.item.description }}</b-card-text>
-        <b-form-input v-model="row.item.description" v-if="row.item.isEdit"/>
+        <b-card-text v-if="!row.item.isEdit">{{ row.item.description | truncate(25, '...')}}</b-card-text>
+        <b-form-textarea
+          id="textarea"
+          v-model="row.item.description"
+          placeholder="Descripción Tarea ..."
+          rows="3"
+          max-rows="6"
+          v-if="row.item.isEdit"
+        ></b-form-textarea>
       </template>
       <template v-slot:cell(priority)="row">
         <b-card-text v-if="!row.item.isEdit">{{ row.item.priority }}</b-card-text>
@@ -202,11 +206,21 @@
       </template>
 
       <template #row-details="row">
-        <b-card>
-          <ul>
-            <li v-for="(value, key) in row.item" :key="key">{{ key }}: {{ value }}</li>
-          </ul>
+        <b-card no-body>
+          
+          <b-card-body>
+            <b-card-title>{{row.item.name}}</b-card-title>
+            <b-card-text>{{ row.item.description }}</b-card-text>
+          </b-card-body>
+
+          <b-list-group flush>
+            <b-list-group-item>{{row.item.priority}}</b-list-group-item>
+            <b-list-group-item>{{row.item.isCompleted}}</b-list-group-item>
+            <b-list-group-item>{{ getTimeInHoursAndMins(row.item.totalTime) }}</b-list-group-item>
+          </b-list-group>
+
         </b-card>
+        
       </template>
     </b-table>
 
@@ -242,11 +256,18 @@
     name: 'TaskList',
     components: {
       CreateTaskModal,
-      // EditTaskModal,
-      // TimerClock
     },
     created() {
       this.$store.dispatch('tasks/fetchTasks');
+    },
+    filters: {
+        truncate: function (text, length, suffix) {
+            if (text.length > length) {
+                return text.substring(0, length) + suffix;
+            } else {
+                return text;
+            }
+        },
     },
     mounted() {
       // Set the initial number of items
@@ -294,7 +315,10 @@
           title: '',
           content: ''
         },
-        options: [ 'Alta', 'Media', 'Baja',]
+        options: [ 'Alta', 'Media', 'Baja',],
+        timeDurationInSeconds: 0,
+        hoursText: "hrs",
+        minsText: "mins",
       }
     },
     computed: {
@@ -441,7 +465,31 @@
       updateTask(index, item) {
         this.$store.dispatch('tasks/updateTask', item);
         this.toggleEdit(index);
-      }
+      },
+      getTimeInHoursAndMins(timeInsSeconds) {
+        if (timeInsSeconds && timeInsSeconds > 0) {
+          const minsTemp = timeInsSeconds / 60;
+          let hours = Math.floor(minsTemp / 60);
+          const mins = minsTemp % 60;
+
+          if (hours !== 0 && mins !== 0) {
+            if (mins >= 59) {
+              hours += 1;
+              return +`${hours} ${this.hoursText} `;
+            } else {
+              return `${hours} ${this.hoursText} ${mins.toFixed(0)} ${
+                this.minsText
+              }`;
+            }
+          } else if (hours === 0 && mins !== 0) {
+            return `${mins.toFixed(0)} ${this.minsText}`;
+          } else if (hours !== 0 && mins === 0) {
+            return `${hours} ${this.hoursText}`;
+          }
+        } else {
+          return "-";
+        }
+      },
     }
   }
 </script>
