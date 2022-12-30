@@ -19,8 +19,17 @@ class ApiPostScheduleNewTaskController extends AbstractController
     public function newTask(ManagerRegistry $doctrine, Request $request): Response
     {
         try {
+            
             // Recupero datos desde request
             $param = json_decode($request->getContent(), true);
+
+            // Busco la tarea por uuid
+            $task = $doctrine->getManager()->getRepository(Task::class)->findByUuid($param['id']);
+
+            // Si no esta error
+            if ($task) {
+                throw new \Exception('Task found for id '.$param['id']);
+            }
 
             // Preparo entidad para mandar a repository
             $task = new Task();
@@ -33,6 +42,7 @@ class ApiPostScheduleNewTaskController extends AbstractController
             $task->setDone(0);
             $task->setCreatedAt(new \DateTime());
             $task->setColor('danger');
+            $task->setIsDeleted(0);
 
             // Mando accion (add) al repository
             $doctrine->getRepository(Task::class)->add($task, true);
