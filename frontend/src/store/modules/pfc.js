@@ -21,7 +21,10 @@ const state = {
 const mutations = {
   SET_DOCUMENT: (state, payload) => {
     state.document.title = payload.title;
-    state.document.sections = payload.sections;
+    state.document.sections = [];    
+    if(payload.sections !== null){
+      state.document.sections = payload.sections;
+    }
   },
   UPDATE_SECTION: (state) => {
     state.document.sections.forEach(
@@ -114,7 +117,22 @@ const mutations = {
         }
       }
     );
-  }
+  },
+  CALL_BACKEND () {
+    try {
+      var payload = {
+        "id": apiConfig.DOCUMENT_UUID,
+        "title": state.document.title,
+        "sections": state.document.sections,
+      };
+      axios.post(
+        apiConfig.BACKEND_URL + "/pfc/update",
+        payload
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  },
 }
 
 // getters
@@ -132,14 +150,10 @@ const getters = {
 
 // actions
 const actions = {
-  // fetchDocument ({ commit }) {
-  //   document.getDocument(document => {
-  //     commit('SET_DOCUMENT', document)
-  //   });
-  // },
   updateCurrentSection (context, payload) {
     context.commit('UPDATE_CURRENT_SECTION', payload);
     context.commit('UPDATE_SECTION');
+    context.commit('CALL_BACKEND');
   },
   async fetchDocument({ commit }) {
     try {
@@ -151,23 +165,29 @@ const actions = {
       console.log(error);
     }
   },
-  addNewSection (context, payload) {
-    context.commit('ADD_NEW_SECTION', payload);
+  addNewSection (context, section) {    
+    context.commit('ADD_NEW_SECTION', section);
+    context.commit('CALL_BACKEND');
   },
   deleteSection(context, payload) {
     context.commit('DELETE_SECTION', payload);
+    context.commit('CALL_BACKEND');
   },
   deleteSubsection(context, payload) {
     context.commit('DELETE_SUBSECTION', payload);
+    context.commit('CALL_BACKEND');
   },
   updateSubsectionTitle(context, payload) {
     context.commit('UPDATE_SUBSECTION_TITLE', payload);
+    context.commit('CALL_BACKEND');
   },
   addNewSubsection (context, payload) {
     context.commit('ADD_NEW_SUBSECTION', payload);
+    context.commit('CALL_BACKEND');
   },
   updateSubsectionContent(context, payload) {
     context.commit('UPDATE_SUBSECTION_CONTENT', payload);
+    context.commit('CALL_BACKEND');
   }
 }
 

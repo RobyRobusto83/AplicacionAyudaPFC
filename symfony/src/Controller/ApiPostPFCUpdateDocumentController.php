@@ -22,7 +22,7 @@ class ApiPostPFCUpdateDocumentController extends AbstractController
             $param = json_decode($request->getContent(), true);
 
             // Busco la tarea por uuid
-            $lastVersion = $doctrine->getManager()->getRepository(Document::class)->findByUuid($param['id']);
+            $lastVersion = $doctrine->getManager()->getRepository(Document::class)->findByVersion($param['id']);
 
             // Si no esta, error
             if (!$lastVersion) {
