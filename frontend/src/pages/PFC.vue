@@ -1,5 +1,12 @@
 <template>
   <div>
+  <div class="starter-template" v-if="!$store.getters['pfc/hasContent']">
+      <p class="lead">Define el PFC</p>
+      <b-form-input v-model="newPFC"></b-form-input>
+        <b-button size="sm" @click="addPFC()" class="mr-1" variant="primary"><b-icon-check-square/></b-button>       
+  </div>
+
+  <div v-if="$store.getters['pfc/hasContent']">
     <h2>{{ $store.getters['pfc/title'] }}</h2>
     <b-list-group>
       <SectionPfc
@@ -18,11 +25,14 @@
     </b-list-group>
     
   </div>
+  </div>
 </template>
   
 <script>
 import { v4 as uuidv4 } from 'uuid';
 import SectionPfc from '@/components/pfc/SectionPFC.vue'
+import apiConfig from '@/api'
+import axios from "axios";
 
 export default {
   name: 'PFC',
@@ -32,6 +42,7 @@ export default {
   data() {
     return {
       enabledAddSection: false,
+      newPFC:''
     }
   },
   created() {
@@ -49,6 +60,25 @@ export default {
         subsections: []
       }
       this.$store.dispatch('pfc/addNewSection', newSection);
+    },
+    addPFC(){
+      try {
+        // Preparar la variable para conectar con axios
+        var payload = {
+          "id": apiConfig.DOCUMENT_UUID,
+          "title": this.newPFC
+        };
+        // Realizar la llamada a axios mediante POST
+        axios.post(
+          apiConfig.BACKEND_URL + "/pfc/new",
+          payload
+        );
+        // Recargar documento
+        this.$store.dispatch('pfc/fetchDocument');
+
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 }

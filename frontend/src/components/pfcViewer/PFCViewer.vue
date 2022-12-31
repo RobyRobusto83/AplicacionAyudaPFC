@@ -7,6 +7,7 @@
 
         </div>
         <div v-if="$store.getters['pfc/hasContent']">
+            <h2>{{ $store.getters['pfc/title'] }}</h2>
             <PFCSectionViewer
                 v-for="section in $store.getters['pfc/content']"
                 :key="section.id"

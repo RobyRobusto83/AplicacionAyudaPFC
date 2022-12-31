@@ -1,4 +1,4 @@
-// import document from '@/api/document'
+import apiConfig from '@/api'
 import axios from "axios";
 
 // initial state
@@ -144,7 +144,7 @@ const actions = {
   async fetchDocument({ commit }) {
     try {
       const data = await axios.get(
-        "http://localhost:9980/api/pfc/getContent"
+        apiConfig.BACKEND_URL + "/pfc/getContent/" + apiConfig.DOCUMENT_UUID
       );
       commit("SET_DOCUMENT", data.data.document);
     } catch (error) {

@@ -24,6 +24,9 @@ class ApiGetPFCContentController extends AbstractController
 //            $data = $this->getData();
             $dataDB = $doctrine->getRepository(Document::class)->findByVersion($id);
 
+            if(!$dataDB) {
+               throw new \Exception("Document not found"); 
+            }
             $data =  [
                 'title' => $dataDB->getTitle(),
                 'sections' => []

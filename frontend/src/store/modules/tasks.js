@@ -1,4 +1,4 @@
-// import schedule from '@/api/schedule'
+import apiConfig from '@/api'
 import axios from "axios";
 
 // initial state
@@ -47,7 +47,7 @@ const actions = {
   async addNewTask (context, newTask) {      
       try {
         await axios.post(
-          "http://localhost:9980/api/schedule/newTask",
+          apiConfig.BACKEND_URL + "/schedule/newTask",
           {
             "id": newTask.uuid,
             "name": newTask.name,
@@ -64,7 +64,7 @@ const actions = {
   async fetchTasks ({ commit }) {
     try {
       const data = await axios.get(
-        "http://localhost:9980/api/schedule/tasks"
+        apiConfig.BACKEND_URL + "/schedule/tasks"
       );
       commit("SET_TASKS", data.data.tasks);
     } catch (error) {
@@ -87,7 +87,7 @@ const actions = {
         "color": updateTask._rowVariant
       };
       axios.post(
-        "http://localhost:9980/api/schedule/updateTask",
+        apiConfig.BACKEND_URL + "/schedule/updateTask",
         payload
       );
       context.commit('UPDATE_TASK', updateTask);
@@ -99,7 +99,7 @@ const actions = {
   async deleteTask (context, taskId) {      
     try {
       axios.delete(
-        "http://localhost:9980/api/schedule/deleteTask/" + taskId
+        apiConfig.BACKEND_URL + "/schedule/deleteTask/" + taskId
       );
     } catch (error) {
       console.log(error);

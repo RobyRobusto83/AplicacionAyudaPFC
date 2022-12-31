@@ -11,6 +11,7 @@
   </template>
   
   <script>
+  import apiConfig from '@/api'
   import axios from "axios";
 
   export default {
@@ -93,7 +94,7 @@
             "time": this.sec + this.min * 60 + this.hour * 3600
           };
           axios.post(
-            "http://localhost:9980/api/schedule/assignTimeToTask",
+            apiConfig.BACKEND_URL + "/schedule/assignTimeToTask",
             payload
           );
         } catch (error) {
