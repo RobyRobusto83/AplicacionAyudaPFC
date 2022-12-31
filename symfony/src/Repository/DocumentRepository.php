@@ -15,9 +15,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Document[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class DocumentRepository extends ServiceEntityRepository
-{
-    private const UUID_DOCUMENT = 'da4829e8-7735-4a76-bafc-bdaa252c312b';
-    
+{    
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Document::class);
@@ -41,15 +39,28 @@ class DocumentRepository extends ServiceEntityRepository
         }
     }
 
-    public function findByVersion(): ?Document
+    public function findByUuid(string $value): ?Document
     {
         return $this->createQueryBuilder('d')
-            ->andWhere('d.uuid = :identifier')
-            ->setParameter('identifier', self::UUID_DOCUMENT)
+            ->where('d.uuid = :identifier')
+            ->setParameter('identifier', $value)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
+
+    public function findByVersion(string $value): ?Document
+    {
+        return $this->createQueryBuilder('d')
+            ->where('d.uuid = :identifier')
+            ->setParameter('identifier', $value)
+            ->orderBy('d.version', 'DESC')
+            ->setMaxResults( 1 )
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
 
 //    /**
 //     * @return Document[] Returns an array of Document objects

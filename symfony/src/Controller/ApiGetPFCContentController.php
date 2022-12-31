@@ -15,12 +15,19 @@ use Throwable;
 
 class ApiGetPFCContentController extends AbstractController
 {
-    #[Route('/api/pfc/getContent', name: 'pfc_get_content', methods: ['GET'])]
+    #[Route('/api/pfc/getContent/{uuid}', name: 'pfc_get_content', methods: ['GET'])]
     public function getContent(ManagerRegistry $doctrine, Request $request): Response
     {
         try {
+            $id = $request->attributes->get("uuid");
+
 //            $data = $this->getData();
-            $data = $this->getFromDatabase($doctrine);
+            $dataDB = $doctrine->getRepository(Document::class)->findByVersion($id);
+
+            $data =  [
+                'title' => $dataDB->getTitle(),
+                'sections' => []
+            ];
         } catch (Throwable $e) {
             return new JsonResponse(
                 [
@@ -39,16 +46,6 @@ class ApiGetPFCContentController extends AbstractController
 
     }
     
-    private function getFromDatabase(ManagerRegistry $mr): array
-    {
-        $data = $mr->getRepository(Document::class)->findByVersion();
-
-        return [
-            'title' => $data->getTitle(),
-            'sections' => []
-        ];
-    }
-
     private function prepareResponseData(array $data): array
     {
         return ['document' => $data];
