@@ -29,7 +29,7 @@ class ApiGetPFCContentController extends AbstractController
             }
             $data =  [
                 'title' => $dataDB->getTitle(),
-                'sections' => []
+                'sections' => json_decode($dataDB->getContent(), true),
             ];
         } catch (Throwable $e) {
             return new JsonResponse(

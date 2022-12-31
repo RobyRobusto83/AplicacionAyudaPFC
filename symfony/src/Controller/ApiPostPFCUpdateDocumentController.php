@@ -11,10 +11,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
 
-class ApiPostPFCNewController extends AbstractController
+class ApiPostPFCUpdateDocumentController extends AbstractController
 {
-    #[Route('/api/pfc/new', name: 'pfc_new_document', methods: ['POST'])]
-    public function new(ManagerRegistry $doctrine, Request $request): Response
+    #[Route('/api/pfc/update', name: 'pfc_update_document', methods: ['POST'])]
+    public function index(ManagerRegistry $doctrine, Request $request): Response
     {
         try {
             
@@ -22,20 +22,20 @@ class ApiPostPFCNewController extends AbstractController
             $param = json_decode($request->getContent(), true);
 
             // Busco la tarea por uuid
-            $document = $doctrine->getManager()->getRepository(Document::class)->findByUuid($param['id']);
+            $lastVersion = $doctrine->getManager()->getRepository(Document::class)->findByUuid($param['id']);
 
-            // Si esta, error
-            if ($document) {
-                throw new \Exception('Document found for id '.$param['id']);
+            // Si no esta, error
+            if (!$lastVersion) {
+                throw new \Exception('Document not found for id '.$param['id']);
             }
 
             // Preparo entidad para mandar a repository
             $document = new Document();
-            $document->setUuid($param['id']);
+            $document->setUuid($lastVersion->getUuid());
             $document->setTitle($param['title']);
-            $document->setVersion(1);
+            $document->setVersion($lastVersion->getVersion() + 1);
             $document->setCreatedAt(new \DateTime());
-            $document->setContent('');
+            $document->setContent(json_encode($param['sections']));
 
             // Mando accion (add) al repository
             $doctrine->getRepository(Document::class)->add($document, true);
