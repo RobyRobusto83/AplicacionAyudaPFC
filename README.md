@@ -1,6 +1,6 @@
 # AplicacionAyudaPFC
 
-OBJETIVO PRINCIAL ---> El objetivo principal de este proyecto es crear una aplicación/asistente para la gestión de la memoria del proyecto con salida en formato editable, que pueda ser exportado a una suite informática como Microsoft Office o LibreOffice.
+OBJETIVO PRINCIPAL ---> El objetivo principal de este proyecto es crear una aplicación/asistente para la gestión de la memoria del proyecto con salida en formato editable, que pueda ser exportado a una suite informática como Microsoft Office o LibreOffice.
 
 El objetivo principal se desglosa en los siguientes objetivos secundarios:
     • Gestión del documento.
@@ -19,7 +19,7 @@ Que necesito para ello:
 
 
 ASISTENTE DE MEMORIA:
-  1. Herramienta que ayude a elavorar la memoria de las PFC.
+  1. Herramienta que ayude a elaborar la memoria de las PFC.
   2. Que permita definir estructura básica.
   3. Que permita añadir contenido de texto, imágenes y video.
   4. Que permita PDF y HTML.
@@ -48,7 +48,7 @@ Se utilizará un entorno de trabajo utilizando docker y que implementa el servid
 La aplicación se desarrolla utilizando el framework de trabajo Symfony en su versión 6. También cabe destacar el uso de Bootstrap y Vue para los diseños visuales de las páginas web.
 
 Se utiliza el framework de trabajo de Symfony pues:
-    • Utiliza un concepto de Modelo-Vista-Controlador1.
+    • Utiliza un concepto de Modelo-Vista-Controlador.
     • Te simplifica algunos de los procesos para la conexión con la base de datos.
     • Incorpora la gestión de las vistas utilizando  un sistema de plantillas: twig.
 
