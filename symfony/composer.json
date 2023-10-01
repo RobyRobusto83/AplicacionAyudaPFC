@@ -18,7 +18,9 @@
     "symfony/yaml": "6.1.*"
   },
   "require-dev": {
-    "symfony/maker-bundle": "1.43.*"
+    "phpunit/phpunit": "^9.0",
+    "symfony/maker-bundle": "1.43.*",
+    "symfony/phpunit-bridge": "^6.3"
   },
   "config": {
     "preferred-install": {
