@@ -48,20 +48,20 @@ Se utilizará un entorno de trabajo utilizando docker y que implementa el servid
 La aplicación se desarrolla utilizando el framework de trabajo Symfony en su versión 6. También cabe destacar el uso de Bootstrap y Vue para los diseños visuales de las páginas web.
 
 Se utiliza el framework de trabajo de Symfony pues:
-    1. Utiliza un concepto de Modelo-Vista-Controlador.
-    2. Te simplifica algunos de los procesos para la conexión con la base de datos.
-    3. Incorpora la gestión de las vistas utilizando  un sistema de plantillas: twig.
+  1. Utiliza un concepto de Modelo-Vista-Controlador.
+  2. Te simplifica algunos de los procesos para la conexión con la base de datos.
+  3. Incorpora la gestión de las vistas utilizando  un sistema de plantillas: twig.
 
 # ESTRUCTURA DEL PROYECTO
 
 La estructura de la aplicación es de un proyecto Symfony. Las principales carpetas son: 
-    1. bin: contiene los archivos referentes a los comandos ejecutables en terminal.
-    2. config: contiene los archivos de configuración de la aplicación.
-    3. public: punto donde la aplicación se instancia para que se vea en el navegador.
-    4. src: contiene el código fuente de la aplicación.
-        I. Controller: contiene los controladores que dan funcionalidad a la aplicación. 
-        II. Entity: contiene los distintos ficheros .git.
-        III. Repository: contiene los distintos ficheros .gitignore.
-    5. templates: contiene las distintas plantillas Twig.
-    6. var: contiene los archivos de caché, logs.
-    7. vendor: contiene el código de Symfony y las librerías externas.
+  1. bin: contiene los archivos referentes a los comandos ejecutables en terminal.
+  2. config: contiene los archivos de configuración de la aplicación.
+  3. public: punto donde la aplicación se instancia para que se vea en el navegador.
+  4. src: contiene el código fuente de la aplicación.
+      I. Controller: contiene los controladores que dan funcionalidad a la aplicación. 
+      II. Entity: contiene los distintos ficheros .git.
+      III. Repository: contiene los distintos ficheros .gitignore.
+  5. templates: contiene las distintas plantillas Twig.
+  6. var: contiene los archivos de caché, logs.
+  7. vendor: contiene el código de Symfony y las librerías externas.
