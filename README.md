@@ -59,9 +59,9 @@ La estructura de la aplicación es de un proyecto Symfony. Las principales carpe
   2. config: contiene los archivos de configuración de la aplicación.
   3. public: punto donde la aplicación se instancia para que se vea en el navegador.
   4. src: contiene el código fuente de la aplicación.
-      I. Controller: contiene los controladores que dan funcionalidad a la aplicación. 
-      II. Entity: contiene los distintos ficheros .git.
-      III. Repository: contiene los distintos ficheros .gitignore.
+    I. Controller: contiene los controladores que dan funcionalidad a la aplicación. 
+    II. Entity: contiene los distintos ficheros .git.
+    III. Repository: contiene los distintos ficheros .gitignore.
   5. templates: contiene las distintas plantillas Twig.
   6. var: contiene los archivos de caché, logs.
   7. vendor: contiene el código de Symfony y las librerías externas.
