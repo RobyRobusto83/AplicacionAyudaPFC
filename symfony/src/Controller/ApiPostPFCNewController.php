@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Document;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,24 +20,16 @@ class ApiPostPFCNewController extends AbstractController
             // Recupero datos desde request
             $param = json_decode($request->getContent(), true);
 
-            // Busco la tarea por uuid
-            $document = $doctrine->getManager()->getRepository(Document::class)->findByUuid($param['id']);
+            $useCase = new NewPfcApplication($doctrine);
+            $useCase->execute($param);
 
-            // Si esta, error
-            if ($document) {
-                throw new \Exception('Document found for id '.$param['id']);
-            }
+            // Informo Ok al cliente
+            return new Response(
+                "OK",
+                Response::HTTP_OK,
+                ['Content-type' => 'application/' . $request->getContentType()]
+            );
 
-            // Preparo entidad para mandar a repository
-            $document = new Document();
-            $document->setUuid($param['id']);
-            $document->setTitle($param['title']);
-            $document->setVersion(1);
-            $document->setCreatedAt(new \DateTime());
-            $document->setContent('');
-
-            // Mando accion (add) al repository
-            $doctrine->getRepository(Document::class)->add($document, true);
         } catch (Throwable $e) {
             return new JsonResponse(
                 [
@@ -48,12 +39,5 @@ class ApiPostPFCNewController extends AbstractController
                 Response::HTTP_BAD_REQUEST
             );
         }
-
-        // Informo Ok al cliente
-        return new Response(
-            "OK",
-            Response::HTTP_OK,
-            ['Content-type' => 'application/' . $request->getContentType()]
-        );
     }
 }
