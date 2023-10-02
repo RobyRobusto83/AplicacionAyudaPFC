@@ -1,8 +1,6 @@
 <?php 
 
-declare(strict_types=1);
-
-namespace App\Pfc\infrastructure\;
+namespace App\Pfc\infrastructure;
 
 use App\Entity\Document;
 use Doctrine\Persistence\ManagerRegistry;
@@ -20,6 +18,12 @@ class PfcRepository
     public function findByUuid(string $value): ?Document
     {
         return $this->repository->findByUuid($value);
+        ;
+    }
+
+    public function findByVersion(string $param): ?Document
+    {
+        return $this->repository->findByVersion($param);
         ;
     }
 

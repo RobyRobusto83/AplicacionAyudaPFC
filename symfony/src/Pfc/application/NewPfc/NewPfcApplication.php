@@ -7,7 +7,7 @@ use Doctrine\Persistence\ManagerRegistry;
 
 final class NewPfcApplication
 {
-    public function __construct(private PfcRepository $repository)
+    public function __construct(private $repository)
     {
 
     }
