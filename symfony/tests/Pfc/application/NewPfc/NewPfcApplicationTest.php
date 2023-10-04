@@ -30,6 +30,8 @@ final class NewPfcAppliacationTest extends TestCase
    {
      $this->repository->expects($this->once())
                  ->method('findByUuid')
-                 ->willReturn("testing") ;
+                 ->willReturn("testing");
+      
+     $this->assertSame('findByUuid', $this->shouldExistPfc());
    }
 }
