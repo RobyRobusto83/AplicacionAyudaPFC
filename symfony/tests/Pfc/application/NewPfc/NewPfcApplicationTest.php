@@ -16,8 +16,7 @@ final class NewPfcApplicationTest extends TestCase
    {
         $this->expectException(\Exception::class);
         $this->shouldExistPfc();
-        $pfc = $this->application();
-        $pfc->execute(["id" => "test", "title" => "TestTitle"]);
+        $this->application()->execute(["id" => "test", "title" => "TestTitle"]);
    }
 
     /** @test */
@@ -25,8 +24,7 @@ final class NewPfcApplicationTest extends TestCase
    {
         $this->shouldNotExistPfc();
         $this->shouldSaveDocument();
-        $pfc = $this->application();
-        $pfc->execute(["id" => "test", "title" => "TestTitle"]);
+        $this->application()->execute(["id" => "test", "title" => "TestTitle"]);
    }
 
    private function application(): NewPfcApplication
@@ -37,7 +35,7 @@ final class NewPfcApplicationTest extends TestCase
    private function repository(): PfcRepository
    {
     if (null === $this->repository){
-      $this->repository=$this->createMock(PfcRepository::class);
+      $this->repository = $this->createMock(PfcRepository::class);
     }
      return $this->repository;
    }
@@ -46,7 +44,7 @@ final class NewPfcApplicationTest extends TestCase
    {
      $this->repository()->expects($this->once())
                  ->method('findByUuid')
-                 ->willReturn($this->document());
+                 ->willReturn(DocumentMother::create());
    }
 
    private function shouldNotExistPfc(): void
@@ -61,15 +59,5 @@ final class NewPfcApplicationTest extends TestCase
     $this->repository()->expects($this->once())->method('add');
    }
 
-   private function document(): Document
-   {
-    $document = new Document();
-        $document->setUuid("PFC1");
-        $document->setTitle("Titulo PFC");
-        $document->setVersion(1);
-        $document->setCreatedAt(new \DateTime());
-        $document->setContent('');
 
-        return $document;
-   }
 }
