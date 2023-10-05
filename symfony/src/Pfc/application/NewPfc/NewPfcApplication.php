@@ -18,7 +18,7 @@ final class NewPfcApplication
         $document = $this->repository->findByUuid($param['id']);
 
         // Si esta, error
-        if ($document) {
+        if (null !== $document) {
             throw new \Exception('Document found for id '.$param['id']);
         }
 
