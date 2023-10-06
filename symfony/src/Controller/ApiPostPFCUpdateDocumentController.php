@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\Document;
+use App\Pfc\application\UpdatePfc\UpdatePfcApplication;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,28 +19,20 @@ class ApiPostPFCUpdateDocumentController extends AbstractController
     public function index(ManagerRegistry $doctrine, Request $request): Response
     {
         try {
-            
+
             // Recupero datos desde request
             $param = json_decode($request->getContent(), true);
 
-            // Busco la tarea por uuid
-            $lastVersion = $doctrine->getManager()->getRepository(Document::class)->findByVersion($param['id']);
+            $useCase = new UpdatePfcApplication($doctrine);
+            $useCase->execute($param);
 
-            // Si no esta, error
-            if (!$lastVersion) {
-                throw new \Exception('Document not found for id '.$param['id']);
-            }
+            // Informo Ok al cliente
+            return new Response(
+                "OK",
+                Response::HTTP_OK,
+                ['Content-type' => 'application/' . $request->getContentType()]
+            );
 
-            // Preparo entidad para mandar a repository
-            $document = new Document();
-            $document->setUuid($lastVersion->getUuid());
-            $document->setTitle($param['title']);
-            $document->setVersion($lastVersion->getVersion() + 1);
-            $document->setCreatedAt(new \DateTime());
-            $document->setContent(json_encode($param['sections']));
-
-            // Mando accion (add) al repository
-            $doctrine->getRepository(Document::class)->add($document, true);
         } catch (Throwable $e) {
             return new JsonResponse(
                 [
@@ -51,11 +43,5 @@ class ApiPostPFCUpdateDocumentController extends AbstractController
             );
         }
 
-        // Informo Ok al cliente
-        return new Response(
-            "OK",
-            Response::HTTP_OK,
-            ['Content-type' => 'application/' . $request->getContentType()]
-        );
     }
 }

@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Tests\Pfc\application\NewPfc;
+namespace App\Tests\Shared\domain\model;
 
 use App\Entity\Document;
 

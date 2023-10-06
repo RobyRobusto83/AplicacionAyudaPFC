@@ -3,6 +3,7 @@
 namespace App\Tests\Pfc\application\NewPfc;
 
 use App\Pfc\application\NewPfc\NewPfcApplication;
+use App\Tests\Shared\domain\model\DocumentMother;
 use PHPUnit\Framework\TestCase;
 use App\Pfc\infrastructure\PfcRepository;
 use App\Entity\Document;
@@ -58,6 +59,4 @@ final class NewPfcApplicationTest extends TestCase
    {
     $this->repository()->expects($this->once())->method('add');
    }
-
-
 }
