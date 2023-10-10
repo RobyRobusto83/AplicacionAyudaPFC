@@ -19,7 +19,7 @@ final class NewPfcApplication
 
         // Si esta, error
         if (null !== $document) {
-            throw new \Exception('Document found for id '.$param['id']);
+            throw new \Exception('Document found for id ' . $param['id']);
         }
 
         // Preparo entidad para mandar a repository

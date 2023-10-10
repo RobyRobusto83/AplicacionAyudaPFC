@@ -38,29 +38,27 @@ class TaskRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-    
+
     public function findByIdProject(int $value): array
     {
-       return $this->createQueryBuilder('t')
-           ->where('t.isDeleted = 0')
-           ->andWhere('t.idProject = :val')
-           ->setParameter('val', $value)
-        //    ->orderBy('t.id', 'ASC')
-        //    ->setMaxResults(10)
-           ->getQuery()
-           ->getResult()
-       ;
+        return $this->createQueryBuilder('t')
+            ->where('t.isDeleted = 0')
+            ->andWhere('t.idProject = :val')
+            ->setParameter('val', $value)
+            //    ->orderBy('t.id', 'ASC')
+            //    ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
     }
-    
+
     public function findByUuid(string $value): ?Task
     {
-       return $this->createQueryBuilder('t')
-           ->where('t.isDeleted = 0')
-           ->andWhere('t.uuid = :val')
-           ->setParameter('val', $value)
-           ->getQuery()
-           ->getOneOrNullResult()
-       ;
+        return $this->createQueryBuilder('t')
+            ->where('t.isDeleted = 0')
+            ->andWhere('t.uuid = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
 //    /**

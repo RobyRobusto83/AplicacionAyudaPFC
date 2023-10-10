@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\Task;
+use App\Task\application\NewTask\ApiDeleteTaskApplication;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,14 +22,16 @@ class ApiDeleteScheduleTaskController extends AbstractController
             // Recupero datos desde request
             $id = $request->attributes->get("uuid");
 
-            // Busco la tarea por uuid
-            $task = $doctrine->getManager()->getRepository(Task::class)->findByUuid($id);
-            // Si esta lo borro
-            if ($task) {
-                // $doctrine->getManager()->getRepository(Task::class)->remove($task);
-                $task->setIsDeleted(1);
-                $doctrine->getManager()->flush(); 
-            }     
+            $useCase = new ApiDeleteTaskApplication($doctrine);
+            $useCase->execute($id);
+
+            // Informo Ok al cliente
+            return new Response(
+                "OK",
+                Response::HTTP_OK,
+                ['Content-type' => 'application/' . $request->getContentType()]
+            );
+
         } catch (Throwable $e) {
             return new JsonResponse(
                 [
@@ -40,12 +42,7 @@ class ApiDeleteScheduleTaskController extends AbstractController
             );
         }
 
-        // Informo Ok al cliente
-        return new Response(
-            "OK",
-            Response::HTTP_OK,
-            ['Content-type' => 'application/' . $request->getContentType()]
-        );
+
     }
     // public function update(ManagerRegistry $doctrine, int $uuid): Response
     // {

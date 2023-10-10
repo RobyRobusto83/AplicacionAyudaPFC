@@ -37,10 +37,10 @@ class Task
     #[ORM\Column(type: 'string', length: 20)]
     private $color;
 
-    #[ORM\Column(type: "boolean", options: ["default"=>"0"])]
+    #[ORM\Column(type: "boolean", options: ["default" => "0"])]
     private $done;
 
-    #[ORM\Column(type: "boolean", options: ["default"=>"0"])]
+    #[ORM\Column(type: "boolean", options: ["default" => "0"])]
     private $isDeleted;
 
     public function getId(): ?int
@@ -107,7 +107,7 @@ class Task
 
         return $this;
     }
-    
+
     public function assignTime(int $timeSec): self
     {
         $this->timeTotal += $timeSec;
