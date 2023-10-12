@@ -32,3 +32,6 @@ vendor: composer.json
 
 vendor-update: composer.json
 	${DOCKER} run -u ${UID}:${GID} php composer update
+
+integration-test:
+	${DOCKER} run -u ${UID}:${GID} php vendor/bin/phpunit -c phpunit_integration.xml.dist

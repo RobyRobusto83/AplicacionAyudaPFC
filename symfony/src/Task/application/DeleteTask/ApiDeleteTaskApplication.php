@@ -18,7 +18,7 @@ final class ApiDeleteTaskApplication
             if ($task) {
                 // $doctrine->getManager()->getRepository(Task::class)->remove($task);
                 $task->setIsDeleted(1);
-                $this->repository->getManager()->flush();
+                $this->repository->save($task);
             }
     }
 }

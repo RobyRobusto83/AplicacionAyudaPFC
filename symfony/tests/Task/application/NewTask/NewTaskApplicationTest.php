@@ -2,8 +2,8 @@
 
 namespace App\Tests\Task\application\NewTask;
 
-use App\Repository\TaskRepository;
 use App\Task\application\NewTask\NewTaskApplication;
+use App\Task\infrastructure\TaskRepository;
 use App\Tests\Shared\domain\model\DocumentMother;
 use App\Tests\Shared\domain\model\TaskMother;
 use PHPUnit\Framework\TestCase;

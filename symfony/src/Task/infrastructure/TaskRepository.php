@@ -5,7 +5,7 @@ namespace App\Task\infrastructure;
 use App\Entity\Task;
 use Doctrine\Persistence\ManagerRegistry;
 
-final class TaskRepository
+class TaskRepository
 {
     private TaskRepository $repository;
 
@@ -24,8 +24,13 @@ final class TaskRepository
         return $this->repository->findByVersion($param);
     }
 
-    public function add(Task $entity, bool $flush = false): void
+    public function add(Task $entity): void
     {
-        $this->repository->add($entity, $flush);
+        $this->repository->save($entity);
+    }
+
+    public function save(Task $entity): void
+    {
+        $this->repository->save($entity);
     }
 }

@@ -21,7 +21,7 @@ class TaskRepository extends ServiceEntityRepository
         parent::__construct($registry, Task::class);
     }
 
-    public function add(Task $entity, bool $flush = false): void
+    public function save(Task $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
