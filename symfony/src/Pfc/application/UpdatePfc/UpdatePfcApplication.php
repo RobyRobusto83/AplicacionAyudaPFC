@@ -22,14 +22,11 @@ final class UpdatePfcApplication
             }
 
         // Preparo entidad para mandar a repository
-            $document = new Document();
-            $document->setUuid($lastVersion->getUuid());
-            $document->setTitle($param['title']);
-            $document->setVersion($lastVersion->getVersion() + 1);
-            $document->setCreatedAt(new \DateTime());
-            $document->setContent(json_encode($param['sections']));
+        $lastVersion->setTitle($param['tittle']);
+        $lastVersion->setVersion($lastVersion->getVersion() + 1);
+        $lastVersion->setContent(json_encode($param['sections']));
 
             // Mando accion (add) al repository
-            $this->repository->add($document, true);
+            $this->repository->add($lastVersion, true);
     }
 }

@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 
-final class PfcRepository
+class PfcRepository
 {
     private DocumentRepository $repository;
 
@@ -32,5 +32,9 @@ final class PfcRepository
     {
         $this->repository->add($entity, $flush);
 
+    }
+
+    public function expects(\PHPUnit\Framework\MockObject\Rule\InvokedCount $once)
+    {
     }
 }

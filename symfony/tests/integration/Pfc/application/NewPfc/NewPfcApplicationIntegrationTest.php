@@ -6,24 +6,26 @@ use App\Pfc\application\NewPfc\NewPfcApplication;
 use App\Pfc\infrastructure\PfcRepository;
 use App\Tests\Shared\domain\model\DocumentMother;
 use App\Tests\Shared\infrastrucutre\Doctrine\DoctrineBaseInfraestructureTestCase;
+use Ramsey\Uuid\Uuid;
 
 class NewPfcApplicationIntegrationTest extends DoctrineBaseInfraestructureTestCase
 {
- private ?PfcRepository $pfcRepository = null;
+    private ?PfcRepository $pfcRepository = null;
 
-   public function test_if_pfc_exists_throw_exception(): void
-   {
+    public function test_if_pfc_exists_throw_exception(): void
+    {
+        $uuid = Uuid::uuid4();
         $this->expectException(\Exception::class);
-        $this->shouldExistPfc("test", "TestTitle");
-        $this->application()->execute(["id" => "test", "title" => "TestTitle"]);
-   }
+        $this->shouldExistPfc($uuid, "TestTitle");
+        $this->application()->execute(["id" => $uuid, "title" => "TestTitle"]);
+    }
 
     public function test_if_pfc_dont_exits_then_it_is_created(): void
     {
-        $uuid = "newUuid";
+        $uuid = Uuid::uuid4();
         $title = "PFC title";
         $this->application()->execute(["id" => $uuid, "title" => $title]);
-        $createdPfc = $this->pfcRepository->findByUuid("newUuid");
+        $createdPfc = $this->pfcRepository->findByUuid($uuid);
         $this->assertEquals($uuid, $createdPfc->getUuid());
         $this->assertEquals($title, $createdPfc->getTitle());
         $this->assertEquals(1, $createdPfc->getVersion());

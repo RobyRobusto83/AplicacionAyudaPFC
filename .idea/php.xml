@@ -87,6 +87,9 @@
       <path value="$PROJECT_DIR$/symfony/vendor/psr/event-dispatcher" />
       <path value="$PROJECT_DIR$/symfony/vendor/psr/log" />
       <path value="$PROJECT_DIR$/symfony/vendor/composer" />
+      <path value="$PROJECT_DIR$/symfony/vendor/brick/math" />
+      <path value="$PROJECT_DIR$/symfony/vendor/ramsey/uuid" />
+      <path value="$PROJECT_DIR$/symfony/vendor/ramsey/collection" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

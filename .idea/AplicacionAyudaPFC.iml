@@ -91,6 +91,9 @@
       <excludeFolder url="file://$MODULE_DIR$/symfony/vendor/psr/event-dispatcher" />
       <excludeFolder url="file://$MODULE_DIR$/symfony/vendor/psr/log" />
       <excludeFolder url="file://$MODULE_DIR$/symfony/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/symfony/vendor/brick/math" />
+      <excludeFolder url="file://$MODULE_DIR$/symfony/vendor/ramsey/uuid" />
+      <excludeFolder url="file://$MODULE_DIR$/symfony/vendor/ramsey/collection" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
