@@ -30,7 +30,7 @@ class UpdatePfcApplicationIntegrationTest extends DoctrineBaseInfraestructureTes
         $tittle = "PFC title";
         $sections = "";
         $this->shouldExistPfc($uuid, $tittle);
-        $this->application()->execute(["id" => $uuid, "tittle" => $tittle, "sections" =>$sections ]);
+        $this->application()->execute(["id" => $uuid, "tittle" => $tittle, "sections" => $sections]);
         $updatePfc = $this->pfcRepository->findByUuid($uuid);
         $this->assertEquals($uuid, $updatePfc->getUuid());
         $this->assertEquals($tittle, $updatePfc->getTitle());

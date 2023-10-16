@@ -25,38 +25,38 @@ class NewTaskApplicationTest extends TestCase
     {
         $this->shouldNotExistTask();
         $this->shouldSaveTask();
-        $this->application()->execute(["id" => "Task1", "name" => "Task T", "description" => "Description","priority" => "1"]);
+        $this->application()->execute(["id" => "Task1", "name" => "Task T", "description" => "Description", "priority" => "1"]);
     }
 
-     private function application(): NewTaskApplication
-   {
-     return new NewTaskApplication($this->repository());
-   }
-
-   private function repository(): TaskRepository
-   {
-    if (null === $this->repository){
-      $this->repository = $this->createMock(TaskRepository::class);
+    private function application(): NewTaskApplication
+    {
+        return new NewTaskApplication($this->repository());
     }
-     return $this->repository;
-   }
 
-   private function shouldExistTask(): void
-   {
-     $this->repository()->expects($this->once())
-                 ->method('findByUuid')
-                 ->willReturn(TaskMother::create());
-   }
+    private function repository(): TaskRepository
+    {
+        if (null === $this->repository) {
+            $this->repository = $this->createMock(TaskRepository::class);
+        }
+        return $this->repository;
+    }
 
-   private function shouldNotExistTask(): void
-   {
-     $this->repository()->expects($this->once())
-                 ->method('findByUuid')
-                 ->willReturn(null);
-   }
+    private function shouldExistTask(): void
+    {
+        $this->repository()->expects($this->once())
+            ->method('findByUuid')
+            ->willReturn(TaskMother::create());
+    }
 
-   private function shouldSaveTask(): void
-   {
-    $this->repository()->expects($this->once())->method('add');
-   }
+    private function shouldNotExistTask(): void
+    {
+        $this->repository()->expects($this->once())
+            ->method('findByUuid')
+            ->willReturn(null);
+    }
+
+    private function shouldSaveTask(): void
+    {
+        $this->repository()->expects($this->once())->method('add');
+    }
 }

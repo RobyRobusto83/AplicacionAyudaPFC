@@ -18,15 +18,15 @@ final class UpdatePfcApplication
         $lastVersion = $this->repository->findByVersion($param['id']);
 
         if (!$lastVersion) {
-                throw new \Exception('Document not found for id '.$param['id']);
-            }
+            throw new \Exception('Document not found for id ' . $param['id']);
+        }
 
         // Preparo entidad para mandar a repository
         $lastVersion->setTitle($param['tittle']);
         $lastVersion->setVersion($lastVersion->getVersion() + 1);
         $lastVersion->setContent(json_encode($param['sections']));
 
-            // Mando accion (add) al repository
-            $this->repository->add($lastVersion, true);
+        // Mando accion (add) al repository
+        $this->repository->add($lastVersion, true);
     }
 }

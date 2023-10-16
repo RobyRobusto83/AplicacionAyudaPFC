@@ -3,10 +3,11 @@
 namespace App\Task\application\NewTask;
 
 use App\Entity\Task;
+use App\Task\infrastructure\TaskRepositoryBridge;
 
 final class NewTaskApplication
 {
-    public function __construct(private $repository)
+    public function __construct(private TaskRepositoryBridge $repository)
     {
 
     }

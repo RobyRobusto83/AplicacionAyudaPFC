@@ -6,10 +6,10 @@ use App\Entity\Task;
 
 final class TaskMother
 {
-    public static function create(): Task
+    public static function create(string $uuid): Task
     {
         $task = new Task();
-        $task->setUuid("Task1");
+        $task->setUuid($uuid);
         $task->setName("Task T");
         $task->setDescription('description');
         $task->setPriority(1);

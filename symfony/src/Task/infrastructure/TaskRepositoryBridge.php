@@ -3,13 +3,14 @@
 namespace App\Task\infrastructure;
 
 use App\Entity\Task;
-use Doctrine\Persistence\ManagerRegistry;
+use App\Repository\TaskRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
-class TaskRepository
+class TaskRepositoryBridge
 {
     private TaskRepository $repository;
 
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(EntityManagerInterface $registry)
     {
         $this->repository = $registry->getRepository(Task::class);
     }
