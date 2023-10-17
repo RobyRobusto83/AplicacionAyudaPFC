@@ -12,17 +12,18 @@ class ApiDeleteTaskApplicationTest extends TestCase
     private $repository;
 
     /** @test */
-    public function if_task_dont_exits_then_it_is_created(): void
+    public function if_task_dont_exits_then_it_is_deleted(): void
     {
-        $this->shouldNotExistTask();
-        $this->expectException(\Exception::class);
+        $this->shouldExistTask();
         $this->application()->execute("id");
     }
-
 
     /** @test */
     public function if_task_exists_throw_exception(): void
     {
+        $this->shouldNotExistTask();
+        $this->expectException(\Exception::class);
+        $this->application()->execute("id");
         $this->shouldExistTask();
         $this->application()->execute("id");
     }

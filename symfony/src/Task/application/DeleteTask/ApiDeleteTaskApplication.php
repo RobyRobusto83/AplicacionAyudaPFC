@@ -14,6 +14,10 @@ final class ApiDeleteTaskApplication
          // Busco la tarea por uuid
             $task = $this->repository->findByUuid($id);
 
+        // Si no esta error
+        if (!$task) {
+            throw new \Exception('Task not found for id ' . $id);
+        }
             // Si esta lo borro
             if ($task) {
                 // $doctrine->getManager()->getRepository(Task::class)->remove($task);
